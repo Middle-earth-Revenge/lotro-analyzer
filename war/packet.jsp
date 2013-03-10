@@ -1,6 +1,44 @@
+<%@page import="java.util.List"%>
+<%@page import="javax.persistence.EntityManager"%>
+<%@page import="com.google.appengine.api.datastore.Key"%>
+<%@page import="com.blogspot.bwgypyth.lotro.model.Analysis"%>
+<%@page import="com.blogspot.bwgypyth.lotro.json.AnalysisConverter"%>
+<%@page import="com.blogspot.bwgypyth.lotro.model.Packet"%>
+<%@page import="com.blogspot.bwgypyth.lotro.EMF"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%
+EntityManager em = EMF.get().createEntityManager();
+try {
+    Packet packet;
+    if (request.getParameter("packet") != null) { 
+    	packet = em.find(Packet.class, Long.valueOf(request.getParameter("packet")));
+    } else {
+	packet = (Packet) em.createQuery("select packet from Packet packet").setMaxResults(1).getSingleResult();
+    }
+	Analysis analysis = new Analysis();
+    if (request.getParameter("analysis") != null) {
+		/*Query q = pm.newQuery(Analysis.class);
+		q.setFilter("key == keyParam && packet == packetParam");
+		q.declareParameters(Key.class.getName() + " keyParam, Packet packetParam");
+		List<Analysis> analyses = (List<Analysis>) q.execute(Long.valueOf(request.getParameter("analysis")), packet.getKey());
+		out.print(analyses.size());
+		if (!analyses.isEmpty()) {
+			analysis = analyses.get(0);
+		}*/
+		analysis = em.find(Analysis.class, Long.valueOf(request.getParameter("analysis")));
+		out.print(analysis);
+    } else if (!packet.getAnalyses().isEmpty()) {
+    	analysis = packet.getAnalyses().get(0);
+    }
+	pageContext.setAttribute("packet", packet);
+	pageContext.setAttribute("analysis", analysis);
+%>
 <!DOCTYPE html>
 <html>
 	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title></title>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 		<style type="text/css">
 			body {
@@ -23,102 +61,9 @@
 	</head>
 	<body>
 		<script type="text/javascript">
-			var data = '000000000061000100000000000039F7C460000000003F3036313030345F6E65747665723A373533373B206469647665723A39323643443845332D323938342D344341392D394336422D3644463243384542364243331D000000010000000000000034B5FE5008740065007300740075007300650072';
+			var data = '${packet.data}';
 
-			var metadata = [
-				{
-					name: 'header',
-					start: 0x00,
-					end: 0x15,
-					description: '<b>Payload Header part</b>',
-					color: '#000000',
-					foregroundColor: '#ffffff'
-				},
-				{
-					name: 'header0',
-					start: 0x02,
-					end: 0x03,
-					description: 'The (pseudo) Header part - During session setup (the header starts with 0x00 0x00) its length is 22 bytes, in all other cases its 20 bytes long',
-					color: '#c2d59b'
-				},
-				{
-					name: 'header1',
-					start: 0x04,
-					end: 0x05,
-					description: 'Session ID from client / server',
-					color: '#ff66cc'
-				},
-				{
-					name: 'header2',
-					start: 0x06,
-					end: 0x09,
-					description: 'Size of Payload Data part (0x0061h == 97 bytes payload data part length)',
-					color: '#66ff33'
-				},
-				{
-					name: 'header3',
-					start: 0x0A,
-					end: 0x0D,
-					description: 'Packet sequence number (no sequence during session establishment)',
-					color: '#ffc000'
-				},
-				{
-					name: 'header4',
-					start: 0x0E,
-					end: 0x11,
-					description: 'Checksum for Payload Data part',
-					color: '#ff0000'
-				},
-				{
-					name: 'header5',
-					start: 0x12,
-					end: 0x15,
-					description: 'Temporary session number (???)',
-					color: '#8db3e1'
-				},
-				{
-					name: 'data',
-					start: 0x16,
-					end: 0x75,
-					description: '<b>Payload Data part</b>',
-					color: '#aaaaaa',
-				},
-				{
-					name: 'data0',
-					start: 0x16,
-					end: 0x55,
-					description: 'Client-Version string with leading length',
-					color: '#c2d59b'
-				},
-				{
-					name: 'data1',
-					start: 0x56,
-					end: 0x59,
-					description: 'Length of remaining data inside the packet',
-					color: '#ffc000'
-				},
-				{
-					name: 'data2',
-					start: 0x5A,
-					end: 0x61,
-					description: 'Unknown',
-					color: '#ffff00'
-				},
-				{
-					name: 'data3',
-					start: 0x62,
-					end: 0x65,
-					description: 'Date & Time when packet was generated [since 01.01.1970]',
-					color: '#00afef'
-				},
-				{
-					name: 'data4',
-					start: 0x66,
-					end: 0x75,
-					description: 'Unicode Account name with leading length', 
-					color: '#ff66cc'
-				}
-			];
+			var metadata = <%= new AnalysisConverter().toJson(analysis).get("analysisEntries").toString() %>;
 
 			function padLeadingZeros(number) {
 				var tmp = '' + number;
@@ -228,3 +173,8 @@
 		<div id="legend"></div>
 	</body>
 </html>
+<%
+} finally {
+    em.close();
+}
+%>
