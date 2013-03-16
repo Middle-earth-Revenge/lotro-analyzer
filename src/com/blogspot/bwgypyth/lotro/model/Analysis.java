@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.users.User;
@@ -88,6 +89,7 @@ public class Analysis {
 		this.modified = modified;
 	}
 
+	@OrderBy("start asc, end desc")
 	public List<AnalysisEntry> getAnalysisEntries() {
 		return analysisEntries;
 	}
