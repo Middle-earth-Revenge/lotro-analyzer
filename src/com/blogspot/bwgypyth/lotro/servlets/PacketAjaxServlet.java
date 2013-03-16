@@ -80,7 +80,7 @@ public class PacketAjaxServlet extends HttpServlet {
 				Integer end = Integer.valueOf(req.getParameter("entry_end")
 						.substring(2), 16);
 				String description = req.getParameter("entry_description");
-				String color = req.getParameter("entry_color");
+				String color = req.getParameter("entry_color").toLowerCase();
 				String foregroundColor = req
 						.getParameter("entry_foregroundcolor");
 				String name = req.getParameter("entry_name");
@@ -103,6 +103,9 @@ public class PacketAjaxServlet extends HttpServlet {
 
 					AnalysisEntry analysisEntry = new AnalysisEntry();
 					analysisEntry.setColor(color);
+					if (foregroundColor != null) {
+						foregroundColor = foregroundColor.toLowerCase();
+					}
 					analysisEntry.setForegroundColor(foregroundColor);
 					analysisEntry.setName(name);
 					analysisEntry.setDescription(description);
