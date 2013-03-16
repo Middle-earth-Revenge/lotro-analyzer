@@ -1,8 +1,11 @@
 package com.blogspot.bwgypyth.lotro.servlets;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
@@ -11,11 +14,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.jsr107cache.Cache;
+import net.sf.jsr107cache.CacheException;
+import net.sf.jsr107cache.CacheFactory;
+import net.sf.jsr107cache.CacheManager;
+
 import com.blogspot.bwgypyth.lotro.EMF;
 import com.blogspot.bwgypyth.lotro.model.Analysis;
 import com.blogspot.bwgypyth.lotro.model.AnalysisEntry;
 import com.blogspot.bwgypyth.lotro.model.Packet;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -23,6 +32,20 @@ import com.google.appengine.api.users.UserServiceFactory;
 public class PacketAjaxServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
+
+	private static Cache cache;
+	private static final String CACHE_KEY_COLORS = "colors";
+	static {
+		try {
+			CacheFactory cacheFactory = CacheManager.getInstance()
+					.getCacheFactory();
+			Map<String, Object> props = new HashMap<>();
+			props.put(GCacheFactory.EXPIRATION_DELTA, 3600);
+			cache = cacheFactory.createCache(props);
+		} catch (CacheException e) {
+			cache = null;
+		}
+	}
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -109,9 +132,12 @@ public class PacketAjaxServlet extends HttpServlet {
 							foregroundColor, name, analysisEntry);
 
 					em.merge(analysisEntry);
+
+					updateColorCache(analysisEntry);
 				} finally {
 					em.close();
 				}
+
 				resp.getOutputStream().print("ok");
 				break;
 			}
@@ -154,45 +180,82 @@ public class PacketAjaxServlet extends HttpServlet {
 					analysisEntry.setAnalysis(analysis);
 
 					em.merge(analysis);
+
+					updateColorCache(analysisEntry);
 				} finally {
 					em.close();
 				}
 				resp.getOutputStream().print("ok");
 				break;
 			}
-			case "autocomplete_color":
+			case "autocomplete_color": {
+				ServletOutputStream out = resp.getOutputStream();
+				resp.setContentType("application/json");
 				String term = req.getParameter("term");
-				EntityManager em = EMF.get().createEntityManager();
-				try {
+				if (cache.containsKey(CACHE_KEY_COLORS)) {
 					@SuppressWarnings("unchecked")
-					List<String> colors = em
-							.createQuery(
-									"select distinct entry.color from AnalysisEntry entry where entry.color like :term")
-							.setParameter("term", term + "%").getResultList();
-					ServletOutputStream out = resp.getOutputStream();
-					resp.setContentType("application/json");
-					out.print("[");
-					boolean first = true;
-					for (String color : colors) {
-						if (!first) {
-							out.print(",");
-						}
-						out.print("{\"id\":\"" + color
-								+ "\",\"label\":\"<span style=\\\"color: "
-								+ color + "\\\">" + color
-								+ "</span>\",\"value\":\"" + color + "\"}");
-						first = false;
-						first = false;
+					List<String> colors = (List<String>) cache
+							.get(CACHE_KEY_COLORS);
+					out.print(getMatchingColors(colors, term));
+				} else {
+					EntityManager em = EMF.get().createEntityManager();
+					try {
+						@SuppressWarnings("unchecked")
+						List<String> colors = em
+								.createQuery(
+										"select distinct entry.color from AnalysisEntry entry")
+								.getResultList();
+
+						cache.put(CACHE_KEY_COLORS, colors);
+						out.print(getMatchingColors(colors, term));
+					} finally {
+						em.close();
 					}
-					out.print("]");
-				} finally {
-					em.close();
 				}
+				break;
+			}
 			default:
 				resp.getOutputStream().print("unknown");
 				break;
 			}
 		}
+	}
+
+	private void updateColorCache(AnalysisEntry analysisEntry) {
+		if (cache != null) {
+			if (cache.containsKey(CACHE_KEY_COLORS)) {
+				@SuppressWarnings("unchecked")
+				List<String> colors = (List<String>) cache
+						.get(CACHE_KEY_COLORS);
+				if (!colors.contains(analysisEntry.getColor())) {
+					colors.add(analysisEntry.getColor());
+					Collections.sort(colors);
+				}
+			}
+		}
+	}
+
+	private String getMatchingColors(List<String> colors, String term) {
+		StringBuilder buffer = new StringBuilder();
+		buffer.append("[");
+		for (String color : colors) {
+			if (color.startsWith(term)) {
+				if (buffer.length() > 1) {
+					buffer.append(",");
+				}
+				buffer.append("{\"id\":\"");
+				buffer.append(color);
+				buffer.append("\",\"label\":\"<span style=\\\"color: ");
+				buffer.append(color);
+				buffer.append("\\\">");
+				buffer.append(color);
+				buffer.append("</span>\",\"value\":\"");
+				buffer.append(color);
+				buffer.append("\"}");
+			}
+		}
+		buffer.append("]");
+		return buffer.toString();
 	}
 
 	private void setAnalysisData(User user, Integer start, Integer end,
