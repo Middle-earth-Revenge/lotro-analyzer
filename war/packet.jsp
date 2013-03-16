@@ -12,7 +12,7 @@
 EntityManager em = EMF.get().createEntityManager();
 try {
 	Packet packet;
-	if (request.getParameter("packet") != null) { 
+	if (request.getParameter("packet") != null) {
 		packet = em.find(Packet.class, Long.valueOf(request.getParameter("packet")));
 	} else {
 	packet = (Packet) em.createQuery("select packet from Packet packet").setMaxResults(1).getSingleResult();
@@ -279,7 +279,7 @@ if (user != null) {
 				});
 
 				var analysis_entry = $('#analysis_entry');
-				analysis_entry.html(getAnalysisEntryDialogContent(entryToEdit.key, entryToEdit.name, entryToEdit.start, entryToEdit.end, entryToEdit.description, entryToEdit.color, entryToEdit.foregroundColor));
+				analysis_entry.html(getAnalysisEntryDialogContent(entryToEdit.key, entryToEdit.name,  padLeadingZeros(entryToEdit.start.toString(16).toUpperCase(), 2), padLeadingZeros(entryToEdit.end.toString(16).toUpperCase(), 2), entryToEdit.description, entryToEdit.color, entryToEdit.foregroundColor));
 				$('#entry_color').htmlautocomplete({
 					source: "packet_ajax?operation=autocomplete_color",
 					minLength: 1
