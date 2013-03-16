@@ -166,7 +166,7 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 						if (element.start*2 == i) {
 							packet_hex += '<span class="hoverable ' + element.name + '">';
 							packet_decoded += '<span class="hoverable ' + element.name + '">';
-							legend += '<div class="hoverable ' + element.name + '">' + element.description;
+							legend += '<div class="hoverable ' + element.name + '">' + element.description + ' (' + (element.end - element.start + 1) + ' Bytes)';
 						}
 					});
 
