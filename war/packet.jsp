@@ -58,13 +58,10 @@ try {
 				margin-left: 8px;
 			}
 		</style>
+		<link rel="stylesheet" href="css/file.css">
 	</head>
 	<body>
 		<script type="text/javascript">
-			var data = '${packet.data}';
-
-			var metadata = <%= new AnalysisConverter().toJson(analysis).get("analysisEntries").toString() %>;
-
 			function padLeadingZeros(number) {
 				var tmp = '' + number;
 				while (tmp.length < 8) {
@@ -73,7 +70,7 @@ try {
 				return tmp;
 			}
 
-			function renderPacket() {
+			function renderPacket(data, metadata, name) {
 				var generatedCss = '<style type="text/css">';
 				$(metadata).each(function(index, element) {
 					if (element.color) {
@@ -134,6 +131,7 @@ try {
 
 				}
 
+				$('#packet_name').html('<h1>' + name + '</h1>');
 				$('#packet_offset').html(packet_offset);
 				$('#packet_hex').html(packet_hex);
 				$('#packet_decoded').html(packet_decoded);
@@ -164,13 +162,39 @@ try {
 			}
 
 			$(function() {
-				renderPacket(data);
+				var data = '${packet.data}';
+				var metadata = <%= new AnalysisConverter().toJson(analysis).get("analysisEntries").toString() %>;
+				var name = '<%= packet.getName() + " - " + analysis.getName() %>';
+				renderPacket(data, metadata, name);
+
+				$('.button_left').mouseover(function() {
+					$('.button_left_img').addClass('button_left_img_hover');
+				});
+				$('.button_left').mouseout(function() {
+					$('.button_left_img').removeClass('button_left_img_hover');
+				});
+				$('.button_right').mouseover(function() {
+					$('.button_right_img').addClass('button_right_img_hover');
+				});
+				$('.button_right').mouseout(function() {
+					$('.button_right_img').removeClass('button_right_img_hover');
+				});
 			});
 		</script>
-		<div id="packet_offset"></div>
-		<div id="packet_hex"></div>
-		<div id="packet_decoded"></div>
-		<div id="legend"></div>
+		<div class="button_left button">
+			<div class="button_left_img"></div>
+		</div>
+		<div class="button_right button">
+			<div class="button_right_img"></div>
+		</div>
+		<%@ include file="navigation.jsp" %>
+		<div class="content">
+			<div id="packet_name"></div>
+			<div id="packet_offset"></div>
+			<div id="packet_hex"></div>
+			<div id="packet_decoded"></div>
+			<div id="legend"></div>
+		</div>
 	</body>
 </html>
 <%

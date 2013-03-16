@@ -19,6 +19,7 @@ public class Packet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Key key;
     private String data;
+    private String name;
     @OneToMany(mappedBy = "packet", cascade = CascadeType.ALL)
     private List<Analysis> analyses = new ArrayList<>(0);
 
@@ -36,6 +37,14 @@ public class Packet {
 
     public void setData(String data) {
 	this.data = data;
+    }
+
+    public String getName() {
+	return name;
+    }
+
+    public void setName(String name) {
+	this.name = name;
     }
 
     public List<Analysis> getAnalyses() {
