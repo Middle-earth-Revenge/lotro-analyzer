@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.users.User;
@@ -30,6 +31,7 @@ public class Analysis {
 	private User modifiedBy;
 	private Date modified;
 	@OneToMany(mappedBy = "analysis", cascade = CascadeType.ALL)
+	@OrderBy("start asc, end desc")
 	private List<AnalysisEntry> analysisEntries = new ArrayList<>(0);
 
 	public Key getKey() {
