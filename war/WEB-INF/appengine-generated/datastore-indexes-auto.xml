@@ -1,0 +1,11 @@
+<!-- Indices written at Sat, 16 Mar 2013 13:39:23 CET -->
+
+<datastore-indexes>
+
+    <!-- Used 1 time in query history -->
+    <datastore-index kind="AnalysisEntry" ancestor="true" source="auto">
+        <property name="start" direction="asc"/>
+        <property name="end" direction="desc"/>
+    </datastore-index>
+
+</datastore-indexes>
