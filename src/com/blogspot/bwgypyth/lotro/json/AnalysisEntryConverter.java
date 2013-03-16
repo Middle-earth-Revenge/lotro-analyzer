@@ -8,6 +8,10 @@ import com.google.common.base.Strings;
 
 public class AnalysisEntryConverter extends AbstractConverter<AnalysisEntry> {
 
+	public AnalysisEntryConverter(IncludeUserdata includeUserdata) {
+		super(includeUserdata);
+	}
+
 	@Override
 	public AnalysisEntry fromJson(JSONObject jsonObject) throws JSONException {
 
@@ -17,6 +21,7 @@ public class AnalysisEntryConverter extends AbstractConverter<AnalysisEntry> {
 					jsonObject.getLong("key")));
 		}
 		entity.setName(jsonObject.getString("name"));
+		userdataFromJson(jsonObject, entity);
 		entity.setStart(jsonObject.getInt("start"));
 		entity.setEnd(jsonObject.getInt("end"));
 		entity.setDescription(jsonObject.getString("description"));
@@ -40,6 +45,7 @@ public class AnalysisEntryConverter extends AbstractConverter<AnalysisEntry> {
 			jsonObject.put("key", "");
 		}
 		jsonObject.put("name", entity.getName());
+		userdataToJson(jsonObject, entity);
 		jsonObject.put("start", entity.getStart());
 		jsonObject.put("end", entity.getEnd());
 		jsonObject.put("description", entity.getDescription());

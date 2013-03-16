@@ -201,7 +201,7 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 
 				}
 
-				$('#name').html('<h1><span id="packet_name">' + packet.name + '</span> - <span id="analysis_name">' + analysis.name + '</span></h1>');
+				$('#name').html('<h1><span id="packet_name">' + packet.name + '</span> - <span id="analysis_name">' + analysis.name + '</span></h1><a href="/export/packet?packet=' + packet.key + '">Export</a>');
 				$('#packet_offset').html(packet_offset);
 				$('#packet_hex').html(packet_hex);
 				$('#packet_decoded').html(packet_decoded);

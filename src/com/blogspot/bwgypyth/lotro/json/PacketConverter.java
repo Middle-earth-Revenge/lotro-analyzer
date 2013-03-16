@@ -9,9 +9,14 @@ import com.google.appengine.labs.repackaged.org.json.JSONObject;
 
 public class PacketConverter extends AbstractConverter<Packet> {
 
+	public PacketConverter(IncludeUserdata includeUserdata) {
+		super(includeUserdata);
+	}
+
 	@Override
 	public Packet fromJson(JSONObject jsonObject) throws JSONException {
-		AnalysisConverter analysisConverter = new AnalysisConverter();
+		AnalysisConverter analysisConverter = new AnalysisConverter(
+				includeUserdata);
 
 		Packet entity = new Packet();
 		if (jsonObject.has("key")) {
@@ -20,6 +25,7 @@ public class PacketConverter extends AbstractConverter<Packet> {
 		}
 		entity.setData(jsonObject.getString("data"));
 		entity.setName(jsonObject.getString("name"));
+		userdataFromJson(jsonObject, entity);
 		JSONArray jsonArray = jsonObject.getJSONArray("analyses");
 		for (int i = 0; i < jsonArray.length(); i++) {
 			Analysis analysis = analysisConverter.fromJson(jsonArray
@@ -33,7 +39,8 @@ public class PacketConverter extends AbstractConverter<Packet> {
 
 	@Override
 	public JSONObject toJson(Packet entity) throws JSONException {
-		AnalysisConverter analysisConverter = new AnalysisConverter();
+		AnalysisConverter analysisConverter = new AnalysisConverter(
+				includeUserdata);
 
 		JSONObject jsonObject = new JSONObject();
 		if (entity.getKey() != null) {
@@ -43,6 +50,7 @@ public class PacketConverter extends AbstractConverter<Packet> {
 		}
 		jsonObject.put("data", entity.getData());
 		jsonObject.put("name", entity.getName());
+		userdataToJson(jsonObject, entity);
 		JSONArray jsonArray = new JSONArray();
 		for (Analysis analysis : entity.getAnalyses()) {
 			jsonArray.put(analysisConverter.toJson(analysis));

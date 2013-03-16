@@ -9,40 +9,48 @@ import com.google.appengine.labs.repackaged.org.json.JSONObject;
 
 public class AnalysisConverter extends AbstractConverter<Analysis> {
 
+	public AnalysisConverter(IncludeUserdata includeUserdata) {
+		super(includeUserdata);
+	}
+
 	@Override
 	public Analysis fromJson(JSONObject jsonObject) throws JSONException {
-		AnalysisEntryConverter analysisEntryConverter = new AnalysisEntryConverter();
+		AnalysisEntryConverter analysisEntryConverter = new AnalysisEntryConverter(
+				includeUserdata);
 
-		Analysis analysis = new Analysis();
+		Analysis entity = new Analysis();
 		if (jsonObject.has("key")) {
-			analysis.setKey(KeyFactory.createKey("Analysis",
+			entity.setKey(KeyFactory.createKey("Analysis",
 					jsonObject.getLong("key")));
 		}
-		analysis.setName(jsonObject.getString("name"));
+		entity.setName(jsonObject.getString("name"));
+		userdataFromJson(jsonObject, entity);
 		JSONArray jsonArray = jsonObject.getJSONArray("analysisEntries");
 		for (int i = 0; i < jsonArray.length(); i++) {
 			AnalysisEntry entry = analysisEntryConverter.fromJson(jsonArray
 					.getJSONObject(i));
-			entry.setAnalysis(analysis);
-			analysis.getAnalysisEntries().add(entry);
+			entry.setAnalysis(entity);
+			entity.getAnalysisEntries().add(entry);
 		}
 
-		return analysis;
+		return entity;
 	}
 
 	@Override
-	public JSONObject toJson(Analysis analysis) throws JSONException {
-		AnalysisEntryConverter analysisEntryConverter = new AnalysisEntryConverter();
+	public JSONObject toJson(Analysis entity) throws JSONException {
+		AnalysisEntryConverter analysisEntryConverter = new AnalysisEntryConverter(
+				includeUserdata);
 
 		JSONObject jsonObject = new JSONObject();
-		if (analysis.getKey() != null) {
-			jsonObject.put("key", analysis.getKey().getId());
+		if (entity.getKey() != null) {
+			jsonObject.put("key", entity.getKey().getId());
 		} else {
 			jsonObject.put("key", "");
 		}
-		jsonObject.put("name", analysis.getName());
+		jsonObject.put("name", entity.getName());
+		userdataToJson(jsonObject, entity);
 		JSONArray jsonArray = new JSONArray();
-		for (AnalysisEntry analysisEntry : analysis.getAnalysisEntries()) {
+		for (AnalysisEntry analysisEntry : entity.getAnalysisEntries()) {
 			jsonArray.put(analysisEntryConverter.toJson(analysisEntry));
 		}
 		jsonObject.put("analysisEntries", jsonArray);
