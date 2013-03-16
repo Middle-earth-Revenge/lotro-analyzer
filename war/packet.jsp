@@ -58,15 +58,28 @@ try {
 <%
 if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 %>
-			span.hex_element_selected {
+			span.decoded_or_hex_element_selected {
 				border: 1px dashed #333333;
 				margin: -1px;
 			}
-			span.hex_element {
+			span.decoded_or_hex_element {
 				cursor: pointer;
 			}
 			[contenteditable] {
 				outline: 1px dotted #CCCCCC;
+			}
+			input.duplicate {
+				border: 1px solid red;
+			}
+
+			.ui-widget {
+				font-size: 0.8em
+			}
+			div#analysis_entry td.description {
+				font-size: 0.7em;
+			}
+			div#analysis_entry th {
+				text-align: left;
 			}
 <%
 }
@@ -85,21 +98,52 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 				return tmp;
 			}
 
+			function generateCss(name, color, foregroundColor) {
+				return '.' + name + ' { margin-left: -1px; margin-right: -1px; border: 1px solid ' + color + '; color: ' + color + '; }\n' + 
+				'.' + name + '_hovered { background-color: ' + color + '; color: ' + foregroundColor + '; }\n';
+			}
+
+			function getForgroundColor(foregroundColor) {
+				if (foregroundColor && foregroundColor != '') {
+					return foregroundColor;
+				}
+				return '#000000';
+			}
+
+			function registerHovering(element) {
+				console.log(element);
+				$(element).on('mouseover', function(event) {
+					$($(this).attr('class').split(' ')).each(function(index1, element1) {
+						if (element1.indexOf('hover') == -1) {
+							$('.' + element1).each(function (index2, element2) {
+								$(element2).addClass(element1 + '_hovered');
+							});
+						}
+					});
+					event.stopPropagation();
+				});
+				$(element).on('mouseout', function(event) {
+					$($(this).attr('class').split(' ')).each(function(index1, element1) {
+						if (element1.indexOf('hover') == -1) {
+							$('.' + element1).each(function (index2, element2) {
+								$(element2).removeClass(element1 + '_hovered');
+							});
+						}
+					});
+					event.stopPropagation();
+				});
+			}
+
 			function renderPacket() {
+
+				// Generate CSS classes for all known analysis entries
 				var generatedCss = '<style type="text/css">';
 				$(analysis.analysisEntries).each(function(index, element) {
 					if (element.color) {
-						var foregroundColor;
-						if (element.foregroundColor) {
-							foregroundColor = element.foregroundColor;
-						} else {
-							foregroundColor = '#000000';
-						}
-						generatedCss += '.' + element.name + ' { margin-left: -1px; margin-right: -1px; border: 1px solid ' + element.color + '; color: ' + element.color + '; }\n' + 
-							'.' + element.name + '_hovered { background-color: ' + element.color + '; color: ' + foregroundColor + '; }\n';
+						var foregroundColor = getForgroundColor(element.foregroundColor);
+						generatedCss += generateCss(element.name, element.color, foregroundColor);
 					}
 				});
-
 				$(generatedCss + '</style>').appendTo('head');
 
 				var packet_offset, offset, packet_hex, packet_decoded, legend;
@@ -109,6 +153,9 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 				packet_decoded = '<br/>';
 				legend = '';
 				for (var i = 0; i < packet.data.length; i+=2) {
+					var hexOffset = padLeadingZeros((i/2).toString(16).toUpperCase(), 2);
+
+					// Check if the current byte is a starting byte of any analysis entry
 					$(analysis.analysisEntries).each(function(index, element) {
 						if (element.start*2 == i) {
 							packet_hex += '<span class="hoverable ' + element.name + '">';
@@ -117,14 +164,17 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 						}
 					});
 
-					packet_hex += '<span class="hex_element" id="hex_element_' + padLeadingZeros((i/2).toString(16).toUpperCase(), 2) + '">' + packet.data.substr(i, 2) + '</span>';
+					// Render the bytes
+					packet_hex += '<span class="decoded_or_hex_element" id="hex_element_' + hexOffset + '">' + packet.data.substr(i, 2) + '</span>';
+
+					// Render the decoded bytes
 					var tmp = parseInt(packet.data.substr(i, 2), 16);
 					if (tmp < 33 || (tmp > 126 && tmp < 161)) {
 						tmp = '.';
 					} else {
 						tmp = String.fromCharCode(tmp);
 					}
-					packet_decoded += tmp;
+					packet_decoded += '<span class="decoded_or_hex_element" id="decoded_element_' + hexOffset + '">' + tmp + '</span>';
 
 					$(analysis.analysisEntries).each(function(index, element) {
 						if (element.end*2 == i) {
@@ -153,33 +203,14 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 				$('#legend').html(legend);
 
 				$('.hoverable').each(function(index, element) {
-					$(element).on('mouseover', function(event) {
-						$($(this).attr('class').split(' ')).each(function(index1, element1) {
-							if (element1.indexOf('hover') == -1) {
-								$('.' + element1).each(function (index2, element2) {
-									$(element2).addClass(element1 + '_hovered');
-								});
-							}
-						});
-						event.stopPropagation();
-					});
-					$(element).on('mouseout', function(event) {
-						$($(this).attr('class').split(' ')).each(function(index1, element1) {
-							if (element1.indexOf('hover') == -1) {
-								$('.' + element1).each(function (index2, element2) {
-									$(element2).removeClass(element1 + '_hovered');
-								});
-							}
-						});
-						event.stopPropagation();
-					});
+					registerHovering(element);
 				});
 <%
 if (user != null) {
 %>
-				$('.hex_element').click(function() {
+				$('.decoded_or_hex_element').click(function() {
 					var hex_element_current = this.id.substring(12);
-					$(this).addClass("hex_element_selected");
+					$(this).addClass("decoded_or_hex_element_selected");
 					if (hex_element_start == undefined) {
 						hex_element_start = hex_element_current;
 					} else {
@@ -193,13 +224,13 @@ if (user != null) {
 						$(function() {
 							var analysis_entry = $('#analysis_entry');
 							analysis_entry.html('<table>' +
-									'<tr><th>Name*</th><td><input type="text" id="entry_name" /></td></tr>' +
-									'<tr><th>Start</th><td><input type="text" disabled="disabled" id="entry_start" value="0x' + hex_element_start + '" /></td></tr>' +
-									'<tr><th>End</th><td><input type="text" disabled="disabled" id="entry_end" value="0x' + hex_element_current + '" /></td></tr>' +
-									'<tr><th>Description*</th><td><input type="text" id="entry_description" /></td></tr>' +
-									'<tr><th>Color*</th><td><div class="ui-widget"><input type="text" id="entry_color" /></div></td></tr>' +
-									'<tr><th>Foregroundcolor</th><td><div class="ui-widget"><input type="text" id="entry_foregroundcolor" /></div></td></tr>' +
-									'<tr><td colspan="2"><input type="button" onclick="submitAnalysisEntry();" /></td></tr>' +
+									'<tr><th>Name*</th><td><input type="text" id="entry_name" /></td><td class="description">Unique name of this datapart within the packet (e.g. \'header0\')</td></tr>' +
+									'<tr><th>Start</th><td><input type="text" disabled="disabled" id="entry_start" value="0x' + hex_element_start + '" /></td><td class="description">First element of datapart in packet</td></tr>' +
+									'<tr><th>End</th><td><input type="text" disabled="disabled" id="entry_end" value="0x' + hex_element_current + '" /></td><td class="description">Last element of datapart in packet</td></tr>' +
+									'<tr><th>Description*</th><td><input type="text" id="entry_description" /></td><td class="description">Human readable description of this datapart</td></tr>' +
+									'<tr><th>Color*</th><td><div class="ui-widget"><input type="text" id="entry_color" /></div></td><td class="description">Color to be used for this datapart</td></tr>' +
+									'<tr><th>Foregroundcolor</th><td><div class="ui-widget"><input type="text" id="entry_foregroundcolor" /></div></td><td class="description">Foregroundcolor to be used for this datapart (optional)</td></tr>' +
+									'<tr><td></td><td><input type="button" onclick="submitAnalysisEntry();" value="save" /></td><td></td></tr>' +
 									'</table>');
 							$('#entry_color').autocomplete({
 								source: "packet_ajax?operation=autocomplete_color",
@@ -209,11 +240,14 @@ if (user != null) {
 								}
 							});
 							analysis_entry.dialog({
-								width: 800,
-								height: 400,
+								title: 'Annotate packet',
+								width: 700,
+								height: 260,
 								beforeClose: function() {
-									$('#hex_element_' + $('#entry_start').val().substring(2)).removeClass("hex_element_selected");
-									$('#hex_element_' + $('#entry_end').val().substring(2)).removeClass("hex_element_selected");
+									$('#hex_element_' + $('#entry_start').val().substring(2)).removeClass("decoded_or_hex_element_selected");
+									$('#hex_element_' + $('#entry_end').val().substring(2)).removeClass("decoded_or_hex_element_selected");
+									$('#decoded_element_' + $('#entry_start').val().substring(2)).removeClass("decoded_or_hex_element_selected");
+									$('#decoded_element_' + $('#entry_end').val().substring(2)).removeClass("decoded_or_hex_element_selected");
 								}
 							});
 						});
@@ -243,8 +277,51 @@ if (user != null) {
 						"entry_color": $('#entry_color').val(),
 						"entry_foregroundcolor": $('#entry_foregroundcolor').val(),
 					}
-				}).done(function() {
-					$('#analysis_entry').dialog('close');
+				}).done(function(data) {
+					if (data == 'ok') {
+						// In case we added it remove the class so it's not
+						// shown when reopening the dialog
+						$('#entry_start').removeClass('duplicate');
+
+						var startposition = $('#entry_start').val().substring(2);
+						var endposition = $('#entry_end').val().substring(2);
+						var newHexElement = $('<span class="hoverable ' + $('#entry_name').val() + '"></span>');
+						newHexElement.insertBefore($('#hex_element_' + startposition));
+						var newDecodedElement = $('<span class="hoverable ' + $('#entry_name').val() + '"></span>');
+						newDecodedElement.insertBefore($('#decoded_element_' + startposition));
+						for (var i = parseInt(startposition, 16); i <= parseInt(endposition, 16); i++) {
+							var hexOffset = padLeadingZeros(i.toString(16).toUpperCase(), 2);
+							var nextHexElement = $('#hex_element_' + hexOffset).next()[0];
+							var nextDecodedElement = $('#decoded_element_' + hexOffset).next()[0];
+							newHexElement.append($('#hex_element_' + hexOffset));
+							newDecodedElement.append($('#decoded_element_' + hexOffset));
+							if (i < parseInt(endposition, 16)) {
+								if (nextHexElement instanceof HTMLBRElement) {
+									newHexElement.append(nextHexElement);
+									newDecodedElement.append(nextDecodedElement);
+								} else {
+									newHexElement.append(' ');
+								}
+							}
+						}
+
+						var generatedCss = '<style type="text/css">';
+						var foregroundColor = getForgroundColor($('#entry_foregroundcolor').val());
+						generatedCss += generateCss($('#entry_name').val(), $('#entry_color').val(), foregroundColor)
+						$(generatedCss + '</style>').appendTo('head');
+
+						// Append legend
+						$('#legend').append('<div class="hoverable ' + $('#entry_name').val() + '">' + $('#entry_description').val() + '</div>')
+
+						$('.hoverable').each(function(index, element) {
+							registerHovering(element);
+						});
+
+						$('#analysis_entry').dialog('close');
+					} else if (data == 'duplicate') {
+						$('#entry_name').focus();
+						$('#entry_name').addClass('duplicate');
+					}
 				});
 			}
 <%
@@ -306,7 +383,6 @@ if (user != null) {
 						packet_name.removeAttr("contenteditable");
 					});
 				});
-				
 <%
 }
 %>

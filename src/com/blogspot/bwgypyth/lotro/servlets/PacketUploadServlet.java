@@ -38,6 +38,7 @@ public class PacketUploadServlet extends HttpServlet {
 		packet.setModified(packet.getCreated());
 
 		Analysis analysis = new Analysis();
+		analysis.setName("new Analysis");
 		analysis.setCreatedBy(user);
 		analysis.setCreated(new Date());
 		analysis.setModifiedBy(user);
