@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.blogspot.bwgypyth.lotro.EMF;
+import com.blogspot.bwgypyth.lotro.model.Analysis;
 import com.blogspot.bwgypyth.lotro.model.Packet;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
@@ -35,6 +36,14 @@ public class PacketUploadServlet extends HttpServlet {
 		packet.setCreated(new Date());
 		packet.setModifiedBy(user);
 		packet.setModified(packet.getCreated());
+
+		Analysis analysis = new Analysis();
+		analysis.setCreatedBy(user);
+		analysis.setCreated(new Date());
+		analysis.setModifiedBy(user);
+		analysis.setModified(analysis.getCreated());
+		packet.getAnalyses().add(analysis);
+		analysis.setPacket(packet);
 
 		EntityManager em = EMF.get().createEntityManager();
 		try {

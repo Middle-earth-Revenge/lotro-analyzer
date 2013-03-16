@@ -8,6 +8,15 @@
 		<url-pattern>/packet_upload</url-pattern>
 	</servlet-mapping>
 	<servlet>
+		<servlet-name>PacketAjaxServlet</servlet-name>
+		<servlet-class>com.blogspot.bwgypyth.lotro.servlets.PacketAjaxServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>PacketAjaxServlet</servlet-name>
+		<url-pattern>/packet_ajax</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>Lotro_analyzer</servlet-name>
 		<servlet-class>com.blogspot.bwgypyth.lotro.Lotro_analyzerServlet</servlet-class>
 	</servlet>

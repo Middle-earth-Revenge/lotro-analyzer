@@ -1,6 +1,7 @@
 package com.blogspot.bwgypyth.lotro.model;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -13,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.users.User;
 
 @Entity
 public class Analysis {
@@ -23,6 +25,10 @@ public class Analysis {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Packet packet;
 	private String name;
+	private User createdBy;
+	private Date created;
+	private User modifiedBy;
+	private Date modified;
 	@OneToMany(mappedBy = "analysis", cascade = CascadeType.ALL)
 	private List<AnalysisEntry> analysisEntries = new ArrayList<>(0);
 
@@ -48,6 +54,38 @@ public class Analysis {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public User getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(User createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+
+	public User getModifiedBy() {
+		return modifiedBy;
+	}
+
+	public void setModifiedBy(User modifiedBy) {
+		this.modifiedBy = modifiedBy;
+	}
+
+	public Date getModified() {
+		return modified;
+	}
+
+	public void setModified(Date modified) {
+		this.modified = modified;
 	}
 
 	public List<AnalysisEntry> getAnalysisEntries() {
