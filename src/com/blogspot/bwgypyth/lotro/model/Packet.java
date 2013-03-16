@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.users.User;
 
 @Entity
 public class Packet {
@@ -20,6 +21,7 @@ public class Packet {
 	private Key key;
 	private String data;
 	private String name;
+	private User user;
 	@OneToMany(mappedBy = "packet", cascade = CascadeType.ALL)
 	private List<Analysis> analyses = new ArrayList<>(0);
 
@@ -45,6 +47,14 @@ public class Packet {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public List<Analysis> getAnalyses() {

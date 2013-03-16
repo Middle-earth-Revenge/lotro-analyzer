@@ -5,8 +5,7 @@
 <%@page import="com.blogspot.bwgypyth.lotro.json.AnalysisConverter"%>
 <%@page import="com.blogspot.bwgypyth.lotro.model.Packet"%>
 <%@page import="com.blogspot.bwgypyth.lotro.EMF"%>
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
 EntityManager em = EMF.get().createEntityManager();
 try {
@@ -41,9 +40,6 @@ try {
 		<title></title>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 		<style type="text/css">
-			body {
-				font-family: sans-serif;
-			}
 			div#packet_offset, div#packet_hex, div#packet_decoded {
 				font-family: monospace;
 				float: left;
@@ -120,7 +116,7 @@ try {
 					});
 
 					packet_hex += ' ';
-					
+
 					// Add line breaks where necessary
 					if (i % 32 == 30) {
 						offset += 10;
