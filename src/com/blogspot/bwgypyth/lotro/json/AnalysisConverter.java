@@ -2,6 +2,7 @@ package com.blogspot.bwgypyth.lotro.json;
 
 import com.blogspot.bwgypyth.lotro.model.Analysis;
 import com.blogspot.bwgypyth.lotro.model.AnalysisEntry;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
@@ -13,6 +14,8 @@ public class AnalysisConverter extends AbstractConverter<Analysis> {
 		AnalysisEntryConverter analysisEntryConverter = new AnalysisEntryConverter();
 
 		Analysis analysis = new Analysis();
+		analysis.setKey(KeyFactory.createKey("Packet",
+				jsonObject.getLong("key")));
 		analysis.setName(jsonObject.getString("name"));
 		JSONArray jsonArray = jsonObject.getJSONArray("analysisEntries");
 		for (int i = 0; i < jsonArray.length(); i++) {
@@ -30,6 +33,7 @@ public class AnalysisConverter extends AbstractConverter<Analysis> {
 		AnalysisEntryConverter analysisEntryConverter = new AnalysisEntryConverter();
 
 		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("key", analysis.getKey().getId());
 		jsonObject.put("name", analysis.getName());
 		JSONArray jsonArray = new JSONArray();
 		for (AnalysisEntry analysisEntry : analysis.getAnalysisEntries()) {
