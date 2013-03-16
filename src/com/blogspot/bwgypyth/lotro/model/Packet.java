@@ -1,6 +1,7 @@
 package com.blogspot.bwgypyth.lotro.model;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -21,7 +22,10 @@ public class Packet {
 	private Key key;
 	private String data;
 	private String name;
-	private User user;
+	private User createdBy;
+	private Date created;
+	private User modifiedBy;
+	private Date modified;
 	@OneToMany(mappedBy = "packet", cascade = CascadeType.ALL)
 	private List<Analysis> analyses = new ArrayList<>(0);
 
@@ -49,12 +53,36 @@ public class Packet {
 		this.name = name;
 	}
 
-	public User getUser() {
-		return user;
+	public User getCreatedBy() {
+		return createdBy;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setCreatedBy(User createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+
+	public User getModifiedBy() {
+		return modifiedBy;
+	}
+
+	public void setModifiedBy(User modifiedBy) {
+		this.modifiedBy = modifiedBy;
+	}
+
+	public Date getModified() {
+		return modified;
+	}
+
+	public void setModified(Date modified) {
+		this.modified = modified;
 	}
 
 	public List<Analysis> getAnalyses() {

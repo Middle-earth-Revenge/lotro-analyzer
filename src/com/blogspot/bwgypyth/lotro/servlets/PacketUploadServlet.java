@@ -1,6 +1,7 @@
 package com.blogspot.bwgypyth.lotro.servlets;
 
 import java.io.IOException;
+import java.util.Date;
 
 import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
@@ -30,7 +31,10 @@ public class PacketUploadServlet extends HttpServlet {
 		packet.setName(req.getParameter("name"));
 		packet.setData(req.getParameter("data").replace(" ", "")
 				.replace("\r", "").replace("\n", ""));
-		packet.setUser(user);
+		packet.setCreatedBy(user);
+		packet.setCreated(new Date());
+		packet.setModifiedBy(user);
+		packet.setModified(packet.getCreated());
 
 		EntityManager em = EMF.get().createEntityManager();
 		try {
