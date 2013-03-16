@@ -132,14 +132,18 @@ public class PacketAjaxServlet extends HttpServlet {
 									"select distinct entry.color from AnalysisEntry entry where entry.color like :term")
 							.setParameter("term", term + "%").getResultList();
 					ServletOutputStream out = resp.getOutputStream();
+					resp.setContentType("application/json");
 					out.print("[");
 					boolean first = true;
 					for (String color : colors) {
 						if (!first) {
 							out.print(",");
 						}
-						out.print("{\"id\":\"" + color + "\",\"label\":\""
-								+ color + "\",\"value\":\"" + color + "\"}");
+						out.print("{\"id\":\"" + color
+								+ "\",\"label\":\"<span style=\\\"color: "
+								+ color + "\\\">" + color
+								+ "</span>\",\"value\":\"" + color + "\"}");
+						first = false;
 						first = false;
 					}
 					out.print("]");

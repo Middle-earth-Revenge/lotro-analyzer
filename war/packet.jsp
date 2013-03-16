@@ -39,8 +39,8 @@ try {
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title></title>
 		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
-		<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-		<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.min.js"></script>
+		<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+		<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 		<style type="text/css">
 			div#packet_offset, div#packet_hex, div#packet_decoded {
 				font-family: monospace;
@@ -80,6 +80,11 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 			}
 			div#analysis_entry th {
 				text-align: left;
+			}
+			
+			/* Workaround: autocomplete is behind the dialog */
+			ul.ui-autocomplete {
+				z-index: 101;
 			}
 <%
 }
@@ -232,7 +237,16 @@ if (user != null) {
 									'<tr><th>Foregroundcolor</th><td><div class="ui-widget"><input type="text" id="entry_foregroundcolor" /></div></td><td class="description">Foregroundcolor to be used for this datapart (optional)</td></tr>' +
 									'<tr><td></td><td><input type="button" onclick="submitAnalysisEntry();" value="save" /></td><td></td></tr>' +
 									'</table>');
-							$('#entry_color').autocomplete({
+
+							$.widget('custom.htmlautocomplete', $.ui.autocomplete, {
+								_renderItem: function(ul, item) {
+									return $('<li>')
+									.append($('<a>').html(item.label))
+									.appendTo(ul);
+								}
+							});
+
+							$('#entry_color').htmlautocomplete({
 								source: "packet_ajax?operation=autocomplete_color",
 								minLength: 1,
 								select: function(event, ui) {

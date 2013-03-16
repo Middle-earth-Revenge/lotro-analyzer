@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.users.User;
@@ -87,6 +88,11 @@ public class Packet {
 
 	public List<Analysis> getAnalyses() {
 		return analyses;
+	}
+
+	@Transient
+	public int getAnalysesSize() {
+		return getAnalyses().size();
 	}
 
 	public void setAnalyses(List<Analysis> analyses) {

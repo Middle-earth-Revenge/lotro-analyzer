@@ -7,7 +7,7 @@
 <%
 EntityManager em = EMF.get().createEntityManager();
 try {
-	List<Packet> packets = em.createQuery("select packet from Packet packet").getResultList();
+	List<Packet> packets = em.createQuery("select packet from Packet packet order by name").getResultList();
 %>
 <!DOCTYPE html>
 <html>
@@ -22,6 +22,7 @@ try {
 			<thead>
 				<tr>
 					<th>Packet</th>
+					<th>No. of analyses</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -31,6 +32,7 @@ for (Packet packet : packets) {
 %>
 				<tr>
 					<td><a href="packet.jsp?packet=${packet.key.id}">${packet.name}</a></td>
+					<td>${packet.analysesSize}</td>
 				</tr>
 <%
 }
