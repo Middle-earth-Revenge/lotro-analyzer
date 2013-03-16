@@ -17,44 +17,44 @@ import com.google.appengine.api.datastore.Key;
 @Entity
 public class Analysis {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Key key;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Packet packet;
-    private String name;
-    @OneToMany(mappedBy = "analysis", cascade = CascadeType.ALL)
-    private List<AnalysisEntry> analysisEntries = new ArrayList<>(0);
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Key key;
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Packet packet;
+	private String name;
+	@OneToMany(mappedBy = "analysis", cascade = CascadeType.ALL)
+	private List<AnalysisEntry> analysisEntries = new ArrayList<>(0);
 
-    public Key getKey() {
-	return key;
-    }
+	public Key getKey() {
+		return key;
+	}
 
-    public void setKey(Key key) {
-	this.key = key;
-    }
+	public void setKey(Key key) {
+		this.key = key;
+	}
 
-    public Packet getPacket() {
-	return packet;
-    }
+	public Packet getPacket() {
+		return packet;
+	}
 
-    public void setPacket(Packet packet) {
-	this.packet = packet;
-    }
+	public void setPacket(Packet packet) {
+		this.packet = packet;
+	}
 
-    public String getName() {
-	return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName(String name) {
-	this.name = name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public List<AnalysisEntry> getAnalysisEntries() {
-	return analysisEntries;
-    }
+	public List<AnalysisEntry> getAnalysisEntries() {
+		return analysisEntries;
+	}
 
-    public void setAnalysisEntries(List<AnalysisEntry> analysisEntries) {
-	this.analysisEntries = analysisEntries;
-    }
+	public void setAnalysisEntries(List<AnalysisEntry> analysisEntries) {
+		this.analysisEntries = analysisEntries;
+	}
 }

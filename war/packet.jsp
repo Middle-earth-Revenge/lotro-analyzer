@@ -10,14 +10,14 @@
 <%
 EntityManager em = EMF.get().createEntityManager();
 try {
-    Packet packet;
-    if (request.getParameter("packet") != null) { 
-    	packet = em.find(Packet.class, Long.valueOf(request.getParameter("packet")));
-    } else {
+	Packet packet;
+	if (request.getParameter("packet") != null) { 
+		packet = em.find(Packet.class, Long.valueOf(request.getParameter("packet")));
+	} else {
 	packet = (Packet) em.createQuery("select packet from Packet packet").setMaxResults(1).getSingleResult();
-    }
+	}
 	Analysis analysis = new Analysis();
-    if (request.getParameter("analysis") != null) {
+	if (request.getParameter("analysis") != null) {
 		/*Query q = pm.newQuery(Analysis.class);
 		q.setFilter("key == keyParam && packet == packetParam");
 		q.declareParameters(Key.class.getName() + " keyParam, Packet packetParam");
@@ -28,9 +28,9 @@ try {
 		}*/
 		analysis = em.find(Analysis.class, Long.valueOf(request.getParameter("analysis")));
 		out.print(analysis);
-    } else if (!packet.getAnalyses().isEmpty()) {
-    	analysis = packet.getAnalyses().get(0);
-    }
+	} else if (!packet.getAnalyses().isEmpty()) {
+		analysis = packet.getAnalyses().get(0);
+	}
 	pageContext.setAttribute("packet", packet);
 	pageContext.setAttribute("analysis", analysis);
 %>
@@ -199,6 +199,6 @@ try {
 </html>
 <%
 } finally {
-    em.close();
+	em.close();
 }
 %>

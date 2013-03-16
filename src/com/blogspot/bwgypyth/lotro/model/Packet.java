@@ -15,44 +15,44 @@ import com.google.appengine.api.datastore.Key;
 @Entity
 public class Packet {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Key key;
-    private String data;
-    private String name;
-    @OneToMany(mappedBy = "packet", cascade = CascadeType.ALL)
-    private List<Analysis> analyses = new ArrayList<>(0);
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Key key;
+	private String data;
+	private String name;
+	@OneToMany(mappedBy = "packet", cascade = CascadeType.ALL)
+	private List<Analysis> analyses = new ArrayList<>(0);
 
-    public Key getKey() {
-	return key;
-    }
+	public Key getKey() {
+		return key;
+	}
 
-    public void setKey(Key key) {
-	this.key = key;
-    }
+	public void setKey(Key key) {
+		this.key = key;
+	}
 
-    public String getData() {
-	return data;
-    }
+	public String getData() {
+		return data;
+	}
 
-    public void setData(String data) {
-	this.data = data;
-    }
+	public void setData(String data) {
+		this.data = data;
+	}
 
-    public String getName() {
-	return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName(String name) {
-	this.name = name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public List<Analysis> getAnalyses() {
-	return analyses;
-    }
+	public List<Analysis> getAnalyses() {
+		return analyses;
+	}
 
-    public void setAnalyses(List<Analysis> analyses) {
-	this.analyses = analyses;
-    }
+	public void setAnalyses(List<Analysis> analyses) {
+		this.analyses = analyses;
+	}
 
 }
