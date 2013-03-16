@@ -14,8 +14,10 @@ public class AnalysisConverter extends AbstractConverter<Analysis> {
 		AnalysisEntryConverter analysisEntryConverter = new AnalysisEntryConverter();
 
 		Analysis analysis = new Analysis();
-		analysis.setKey(KeyFactory.createKey("Packet",
-				jsonObject.getLong("key")));
+		if (jsonObject.has("key")) {
+			analysis.setKey(KeyFactory.createKey("Analysis",
+					jsonObject.getLong("key")));
+		}
 		analysis.setName(jsonObject.getString("name"));
 		JSONArray jsonArray = jsonObject.getJSONArray("analysisEntries");
 		for (int i = 0; i < jsonArray.length(); i++) {

@@ -81,7 +81,7 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 			div#analysis_entry th {
 				text-align: left;
 			}
-			
+
 			/* Workaround: autocomplete is behind the dialog */
 			ul.ui-autocomplete {
 				z-index: 101;

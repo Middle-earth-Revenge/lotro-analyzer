@@ -14,10 +14,13 @@ public class PacketConverter extends AbstractConverter<Packet> {
 		AnalysisConverter analysisConverter = new AnalysisConverter();
 
 		Packet entity = new Packet();
-		entity.setKey(KeyFactory.createKey("Packet", jsonObject.getLong("key")));
+		if (jsonObject.has("key")) {
+			entity.setKey(KeyFactory.createKey("Packet",
+					jsonObject.getLong("key")));
+		}
 		entity.setData(jsonObject.getString("data"));
 		entity.setName(jsonObject.getString("name"));
-		JSONArray jsonArray = new JSONArray(jsonObject.get("analyses"));
+		JSONArray jsonArray = jsonObject.getJSONArray("analyses");
 		for (int i = 0; i < jsonArray.length(); i++) {
 			Analysis analysis = analysisConverter.fromJson(jsonArray
 					.getJSONObject(i));
@@ -33,7 +36,11 @@ public class PacketConverter extends AbstractConverter<Packet> {
 		AnalysisConverter analysisConverter = new AnalysisConverter();
 
 		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("key", entity.getKey().getId());
+		if (entity.getKey() != null) {
+			jsonObject.put("key", entity.getKey().getId());
+		} else {
+			jsonObject.put("key", "");
+		}
 		jsonObject.put("data", entity.getData());
 		jsonObject.put("name", entity.getName());
 		JSONArray jsonArray = new JSONArray();
