@@ -78,9 +78,12 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 			}
 			div#analysis_entry td.description {
 				font-size: 0.7em;
+				vertical-align: top;
+				padding-top: 0.5em;
 			}
 			div#analysis_entry th {
 				text-align: left;
+				vertical-align: top;
 			}
 
 			/* Workaround: autocomplete is behind the dialog */
@@ -117,7 +120,6 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 			}
 
 			function registerHovering(element) {
-				console.log(element);
 				$(element).on('mouseover', function(event) {
 					$($(this).attr('class').split(' ')).each(function(index1, element1) {
 						if (element1.indexOf('hover') == -1) {
@@ -166,7 +168,15 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 						if (element.start*2 == i) {
 							packet_hex += '<span class="hoverable ' + element.name + '">';
 							packet_decoded += '<span class="hoverable ' + element.name + '">';
-							legend += '<div class="hoverable ' + element.name + '">' + element.description + ' (' + (element.end - element.start + 1) + ' Bytes)';
+							legend += '<div class="hoverable ' + element.name + '">' + element.description + ' (' + (element.end - element.start + 1) + ' Bytes)'
+<%
+if (user != null) {
+%>
+							+ ' <a href="#" onclick="editAnalysisEntry(\'' + element.name + '\'); return false;">edit</a>'
+<%
+}
+%>
+							;
 						}
 					});
 
@@ -229,35 +239,15 @@ if (user != null) {
 
 						$(function() {
 							var analysis_entry = $('#analysis_entry');
-							analysis_entry.html('<table>' +
-									'<tr><th>Name*</th><td><input type="text" id="entry_name" /></td><td class="description">Unique name of this datapart within the packet (e.g. \'header0\')</td></tr>' +
-									'<tr><th>Start</th><td><input type="text" disabled="disabled" id="entry_start" value="0x' + hex_element_start + '" /></td><td class="description">First element of datapart in packet</td></tr>' +
-									'<tr><th>End</th><td><input type="text" disabled="disabled" id="entry_end" value="0x' + hex_element_current + '" /></td><td class="description">Last element of datapart in packet</td></tr>' +
-									'<tr><th>Description*</th><td><input type="text" id="entry_description" /></td><td class="description">Human readable description of this datapart</td></tr>' +
-									'<tr><th>Color*</th><td><div class="ui-widget"><input type="text" id="entry_color" /></div></td><td class="description">Color to be used for this datapart</td></tr>' +
-									'<tr><th>Foregroundcolor</th><td><div class="ui-widget"><input type="text" id="entry_foregroundcolor" /></div></td><td class="description">Foregroundcolor to be used for this datapart (optional)</td></tr>' +
-									'<tr><td></td><td><input type="button" onclick="submitAnalysisEntry();" value="save" /></td><td></td></tr>' +
-									'</table>');
-
-							$.widget('custom.htmlautocomplete', $.ui.autocomplete, {
-								_renderItem: function(ul, item) {
-									return $('<li>')
-									.append($('<a>').html(item.label))
-									.appendTo(ul);
-								}
-							});
-
+							analysis_entry.html(getAnalysisEntryDialogContent('', '', hex_element_start, hex_element_current, '', '', ''));
 							$('#entry_color').htmlautocomplete({
 								source: "packet_ajax?operation=autocomplete_color",
-								minLength: 1,
-								select: function(event, ui) {
-									console.log(ui);
-								}
+								minLength: 1
 							});
 							analysis_entry.dialog({
 								title: 'Annotate packet',
-								width: 700,
-								height: 260,
+								width: 730,
+								height: 300,
 								beforeClose: function() {
 									$('#hex_element_' + $('#entry_start').val().substring(2)).removeClass("decoded_or_hex_element_selected");
 									$('#hex_element_' + $('#entry_end').val().substring(2)).removeClass("decoded_or_hex_element_selected");
@@ -278,60 +268,69 @@ if (user != null) {
 <%
 if (user != null) {
 %>
+
+			function editAnalysisEntry(name) {
+				var entryToEdit = undefined;
+
+				$(analysis.analysisEntries).each(function(index, element) {
+					if (element.name == name) {
+						entryToEdit = element;
+					}
+				});
+
+				var analysis_entry = $('#analysis_entry');
+				analysis_entry.html(getAnalysisEntryDialogContent(entryToEdit.key, entryToEdit.name, entryToEdit.start, entryToEdit.end, entryToEdit.description, entryToEdit.color, entryToEdit.foregroundColor));
+				$('#entry_color').htmlautocomplete({
+					source: "packet_ajax?operation=autocomplete_color",
+					minLength: 1
+				});
+				analysis_entry.dialog({
+					title: 'Annotate packet',
+					width: 730,
+					height: 300
+				});
+			}
+
+			function getAnalysisEntryDialogContent(key, name, start, end, description, color, foregroundcolor) {
+				var retval;
+				retval = '<table>' +
+					'<tr><th>Name*</th><td><input type="text" id="entry_name" value="' + name +'" style="width: 250px;" /><input type="hidden" id="entry_name_old" value="' + name +'" style="width: 250px;" /></td><td class="description">Unique name of this datapart within the packet (e.g. \'header0\')</td></tr>' +
+					'<tr><th>Start / End</th><td><input type="text" disabled="disabled" id="entry_start" value="0x' + start + '" style="width: 117px;" /><input type="text" disabled="disabled" id="entry_end" value="0x' + end + '" style="margin-left: 10px; width: 117px;" /></td><td class="description">First and last byte of datapart in packet</td></tr>' +
+					'<tr><th>Description*</th><td><textarea id="entry_description" rows="4" cols="30" style="width: 250px;">' + description +'</textarea></td><td class="description">Human readable description of this datapart</td></tr>' +
+					'<tr><th>Color*</th><td><div class="ui-widget"><input type="text" id="entry_color" value="' + color +'" style="width: 250px;" /></div></td><td class="description">Color to be used for this datapart</td></tr>' +
+					'<tr><th>Foregroundcolor</th><td><div class="ui-widget"><input type="text" id="entry_foregroundcolor" value="' + (foregroundcolor == undefined ? '' : foregroundcolor) +'" style="width: 250px;" /></div></td><td class="description">Foregroundcolor to be used for this datapart (optional)</td></tr>' +
+					'<tr><td></td><td><input type="button" onclick="submitAnalysisEntry();" value="save" />';
+				if (key && key != '') {
+					retval += '<input type="hidden" id="entry_key" value="' + key + '" />'
+				}
+				retval += '</td><td></td></tr>' +
+					'</table>';
+				return retval;
+			}
+
 			function submitAnalysisEntry() {
+				var editdata = {
+					"operation": "create_analysisentry",
+					"analysis_key": analysis.key,
+					"packet_key": packet.key,
+					"entry_name": $('#entry_name').val(),
+					"entry_start": $('#entry_start').val(),
+					"entry_end": $('#entry_end').val(),
+					"entry_description": $('#entry_description').val(),
+					"entry_color": $('#entry_color').val(),
+					"entry_foregroundcolor": $('#entry_foregroundcolor').val(),
+				};
+				if ($('#entry_key') && $('#entry_key').val()) {
+					editdata['entry_key'] = $('#entry_key').val();
+					editdata['operation'] = 'update_analysisentry';
+				}
 				$.ajax({
 					url: "packet_ajax",
-					data: {
-						"operation": "create_analysisentry",
-						"analysis_key": analysis.key,
-						"packet_key": packet.key,
-						"entry_name": $('#entry_name').val(),
-						"entry_start": $('#entry_start').val(),
-						"entry_end": $('#entry_end').val(),
-						"entry_description": $('#entry_description').val(),
-						"entry_color": $('#entry_color').val(),
-						"entry_foregroundcolor": $('#entry_foregroundcolor').val(),
-					}
+					data: editdata
 				}).done(function(data) {
 					if (data == 'ok') {
-						// In case we added it remove the class so it's not
-						// shown when reopening the dialog
-						$('#entry_start').removeClass('duplicate');
-
-						var startposition = $('#entry_start').val().substring(2);
-						var endposition = $('#entry_end').val().substring(2);
-						var newHexElement = $('<span class="hoverable ' + $('#entry_name').val() + '"></span>');
-						newHexElement.insertBefore($('#hex_element_' + startposition));
-						var newDecodedElement = $('<span class="hoverable ' + $('#entry_name').val() + '"></span>');
-						newDecodedElement.insertBefore($('#decoded_element_' + startposition));
-						for (var i = parseInt(startposition, 16); i <= parseInt(endposition, 16); i++) {
-							var hexOffset = padLeadingZeros(i.toString(16).toUpperCase(), 2);
-							var nextHexElement = $('#hex_element_' + hexOffset).next()[0];
-							var nextDecodedElement = $('#decoded_element_' + hexOffset).next()[0];
-							newHexElement.append($('#hex_element_' + hexOffset));
-							newDecodedElement.append($('#decoded_element_' + hexOffset));
-							if (i < parseInt(endposition, 16)) {
-								if (nextHexElement instanceof HTMLBRElement) {
-									newHexElement.append(nextHexElement);
-									newDecodedElement.append(nextDecodedElement);
-								} else {
-									newHexElement.append(' ');
-								}
-							}
-						}
-
-						var generatedCss = '<style type="text/css">';
-						var foregroundColor = getForgroundColor($('#entry_foregroundcolor').val());
-						generatedCss += generateCss($('#entry_name').val(), $('#entry_color').val(), foregroundColor)
-						$(generatedCss + '</style>').appendTo('head');
-
-						// Append legend
-						$('#legend').append('<div class="hoverable ' + $('#entry_name').val() + '">' + $('#entry_description').val() + '</div>')
-
-						$('.hoverable').each(function(index, element) {
-							registerHovering(element);
-						});
-
+						// Reload page
+						window.location.reload();
 						$('#analysis_entry').dialog('close');
 					} else if (data == 'duplicate') {
 						$('#entry_name').focus();
@@ -398,6 +397,15 @@ if (user != null) {
 						packet_name.removeAttr("contenteditable");
 					});
 				});
+
+				$.widget('custom.htmlautocomplete', $.ui.autocomplete, {
+					_renderItem: function(ul, item) {
+						return $('<li>')
+						.append($('<a>').html(item.label))
+						.appendTo(ul);
+					}
+				});
+
 <%
 }
 %>

@@ -71,6 +71,50 @@ public class PacketAjaxServlet extends HttpServlet {
 				resp.getOutputStream().print("ok");
 				break;
 			}
+			case "update_analysisentry": {
+				Long analysisentryKey = Long.valueOf(req
+						.getParameter("entry_key"));
+				Long analysisKey = Long.valueOf(req
+						.getParameter("analysis_key"));
+				Long packetKey = Long.valueOf(req.getParameter("packet_key"));
+
+				Integer start = Integer.valueOf(req.getParameter("entry_start")
+						.substring(2), 16);
+				Integer end = Integer.valueOf(req.getParameter("entry_end")
+						.substring(2), 16);
+				String description = req.getParameter("entry_description");
+				String color = req.getParameter("entry_color").toLowerCase();
+				String foregroundColor = req
+						.getParameter("entry_foregroundcolor");
+				String name = req.getParameter("entry_name");
+				EntityManager em = EMF.get().createEntityManager();
+				try {
+					AnalysisEntry analysisEntry = em.find(AnalysisEntry.class,
+							KeyFactory.createKey(KeyFactory.createKey(
+									KeyFactory.createKey("Packet", packetKey),
+									"Analysis", analysisKey), "AnalysisEntry",
+									analysisentryKey));
+
+					for (AnalysisEntry otherAnalysisEntry : analysisEntry
+							.getAnalysis().getAnalysisEntries()) {
+						if (otherAnalysisEntry.getName().equals(name)
+								&& !otherAnalysisEntry.getKey().equals(
+										analysisEntry.getKey())) {
+							resp.getOutputStream().print("duplicate");
+							return;
+						}
+					}
+
+					setAnalysisData(user, start, end, description, color,
+							foregroundColor, name, analysisEntry);
+
+					em.merge(analysisEntry);
+				} finally {
+					em.close();
+				}
+				resp.getOutputStream().print("ok");
+				break;
+			}
 			case "create_analysisentry": {
 				Long analysisKey = Long.valueOf(req
 						.getParameter("analysis_key"));
@@ -102,19 +146,10 @@ public class PacketAjaxServlet extends HttpServlet {
 					}
 
 					AnalysisEntry analysisEntry = new AnalysisEntry();
-					analysisEntry.setColor(color);
-					if (foregroundColor != null) {
-						foregroundColor = foregroundColor.toLowerCase();
-					}
-					analysisEntry.setForegroundColor(foregroundColor);
-					analysisEntry.setName(name);
-					analysisEntry.setDescription(description);
-					analysisEntry.setStart(start);
-					analysisEntry.setEnd(end);
 					analysisEntry.setCreatedBy(user);
 					analysisEntry.setCreated(new Date());
-					analysisEntry.setModifiedBy(user);
-					analysisEntry.setModified(analysis.getCreated());
+					setAnalysisData(user, start, end, description, color,
+							foregroundColor, name, analysisEntry);
 					analysis.getAnalysisEntries().add(analysisEntry);
 					analysisEntry.setAnalysis(analysis);
 
@@ -153,7 +188,26 @@ public class PacketAjaxServlet extends HttpServlet {
 				} finally {
 					em.close();
 				}
+			default:
+				resp.getOutputStream().print("unknown");
+				break;
 			}
 		}
+	}
+
+	private void setAnalysisData(User user, Integer start, Integer end,
+			String description, String color, String foregroundColor,
+			String name, AnalysisEntry analysisEntry) {
+		analysisEntry.setColor(color);
+		if (foregroundColor != null) {
+			foregroundColor = foregroundColor.toLowerCase();
+		}
+		analysisEntry.setForegroundColor(foregroundColor);
+		analysisEntry.setName(name);
+		analysisEntry.setDescription(description);
+		analysisEntry.setStart(start);
+		analysisEntry.setEnd(end);
+		analysisEntry.setModifiedBy(user);
+		analysisEntry.setModified(new Date());
 	}
 }
