@@ -1,3 +1,4 @@
+<%@page import="com.blogspot.bwgypyth.lotro.json.IncludeKey"%>
 <%@page import="com.blogspot.bwgypyth.lotro.json.IncludeUserdata"%>
 <%@page import="com.blogspot.bwgypyth.lotro.json.PacketConverter"%>
 <%@page import="java.util.List"%>
@@ -389,8 +390,8 @@ if (user != null) {
 			var hex_element_start, packet, analysis;
 
 			$(function() {
-				packet = <%= new PacketConverter(IncludeUserdata.INCLUDE_NONE).toJson(packet).toString() %>;
-				analysis = <%= new AnalysisConverter(IncludeUserdata.INCLUDE_NONE).toJson(analysis).toString() %>;
+				packet = <%= new PacketConverter(IncludeUserdata.INCLUDE_NONE, IncludeKey.INCLUDE_ALL).toJson(packet).toString() %>;
+				analysis = <%= new AnalysisConverter(IncludeUserdata.INCLUDE_NONE, IncludeKey.INCLUDE_ALL).toJson(analysis).toString() %>;
 				renderPacket();
 
 				$('.button_left').mouseover(function() {
