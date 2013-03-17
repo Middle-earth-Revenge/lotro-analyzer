@@ -2,19 +2,11 @@ package com.blogspot.bwgypyth.lotro.model;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-
-import com.google.appengine.api.datastore.Key;
 
 @Entity
 public class AnalysisEntry extends OwnedEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Key key;
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Analysis analysis;
 	private String name;
@@ -23,14 +15,6 @@ public class AnalysisEntry extends OwnedEntity {
 	private String description;
 	private String color;
 	private String foregroundColor;
-
-	public Key getKey() {
-		return key;
-	}
-
-	public void setKey(Key key) {
-		this.key = key;
-	}
 
 	public Analysis getAnalysis() {
 		return analysis;

@@ -7,7 +7,7 @@ import javax.persistence.MappedSuperclass;
 import com.google.appengine.api.users.User;
 
 @MappedSuperclass
-public abstract class OwnedEntity {
+public abstract class OwnedEntity extends Entity {
 
 	private User createdBy;
 	private Date created;
