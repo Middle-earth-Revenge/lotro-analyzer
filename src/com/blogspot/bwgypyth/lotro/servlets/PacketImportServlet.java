@@ -46,7 +46,7 @@ public class PacketImportServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+			throws IOException {
 		resp.getOutputStream().print(
 				"<!DOCTYPE html>\n" + "<html>\n" + "<body>\n"
 						+ "<form action=\"/import/packet\" method=\"post\">\n"

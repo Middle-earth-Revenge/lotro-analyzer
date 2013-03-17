@@ -93,10 +93,6 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 			ul.ui-autocomplete {
 				z-index: 101;
 			}
-
-			a.editlink {
-				float: right;
-			}
 <%
 }
 %>
@@ -163,8 +159,8 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 
 				var packet_offset, offset, packet_hex, packet_decoded, legend;
 				offset = 0;
-				packet_offset = 'Offset(h)<br/>' + padLeadingZeros(offset, 8);
-				packet_hex = '00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F<br/>';
+				packet_offset = '<span class="header">Offset(h)</span><br/>' + padLeadingZeros(offset, 8);
+				packet_hex = '<span class="header">00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F</span><br/>';
 				packet_decoded = '<br/>';
 				legend = '';
 				for (var i = 0; i < packet.data.length; i+=2) {
@@ -181,6 +177,11 @@ if (user != null) {
 %>
 							+ ' <a class="editlink" href="#" onclick="editAnalysisEntry(\'' + element.name + '\'); return false;">edit</a>'
 <%
+	if (userService.isUserAdmin()) {
+%>
+							+ ' <a class="deletelink" href="#" onclick="deleteAnalysisentry(' + packet.key + ',' + analysis.key + ',' + element.key + '); return false;">delete</a>'
+<%
+	}
 }
 %>
 							;
@@ -219,7 +220,24 @@ if (user != null) {
 
 				}
 
-				$('#name').html('<h1><span id="packet_name">' + packet.name + '</span> - <span id="analysis_name">' + analysis.name + '</span></h1><a href="/export/packet?packet=' + packet.key + '">Export</a>');
+				var packetName = '<span id="packet_name">' + packet.name + '</span>';
+<%
+if (userService.isUserAdmin()) {
+%>
+				packetName += ' <a href="#" onclick="deletePacket(' + packet.key + '); return false;">delete</a>';
+<%
+}
+%>
+				var analysisName = '<span id="analysis_name">' + analysis.name + '</span>';
+<%
+if (userService.isUserAdmin()) {
+%>
+				analysisName += ' <a href="#" onclick="deleteAnalysis(' + packet.key + ',' + analysis.key + '); return false;">delete</a>';
+<%
+}
+%>
+
+				$('#name').html('<h1>' + packetName + ' - ' + analysisName + '</h1><a href="/export/packet?packet=' + packet.key + '">Export</a>');
 				$('#packet_offset').html(packet_offset);
 				$('#packet_hex').html(packet_hex);
 				$('#packet_decoded').html(packet_decoded);
@@ -295,6 +313,22 @@ if (user != null) {
 					title: 'Annotate packet',
 					width: 730,
 					height: 300
+				});
+			}
+
+			function createAnalysis() {
+				$.ajax({
+					url: "packet_ajax",
+					data: { "operation": "create_analysis" }
+				}).done(function(data) {
+					if (data == 'ok') {
+						// Reload page
+						window.location.reload();
+						$('#analysis_entry').dialog('close');
+					} else if (data == 'duplicate') {
+						$('#entry_name').focus();
+						$('#entry_name').addClass('duplicate');
+					}
 				});
 			}
 
@@ -418,6 +452,13 @@ if (user != null) {
 %>
 			});
 		</script>
+<%
+if (user != null && userService.isUserAdmin()) {
+%>
+		<script type="text/javascript" src="js/packet.edit.js"></script>
+<%
+}
+%>
 		<div class="button_left button">
 			<div class="button_left_img"></div>
 		</div>

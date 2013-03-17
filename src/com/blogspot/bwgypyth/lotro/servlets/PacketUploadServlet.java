@@ -56,12 +56,7 @@ public class PacketUploadServlet extends HttpServlet {
 		OwnedEntity.setCreated(packet, user);
 		OwnedEntity.setModified(packet, user);
 
-		Analysis analysis = new Analysis();
-		analysis.setName("Unnamed Analysis");
-		OwnedEntity.setCreated(analysis, user);
-		OwnedEntity.setModified(analysis, user);
-		packet.getAnalyses().add(analysis);
-		analysis.setPacket(packet);
+		Analysis.createStubAnalysis(packet, user);
 
 		EntityManager em = EMF.get().createEntityManager();
 		try {

@@ -31,6 +31,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 
+import com.google.appengine.api.users.User;
+
 @Entity
 public class Analysis extends OwnedEntity {
 
@@ -63,5 +65,15 @@ public class Analysis extends OwnedEntity {
 
 	public void setAnalysisEntries(List<AnalysisEntry> analysisEntries) {
 		this.analysisEntries = analysisEntries;
+	}
+
+	public static Analysis createStubAnalysis(Packet packet, User user) {
+		Analysis analysis = new Analysis();
+		analysis.setName("Unnamed Analysis");
+		OwnedEntity.setCreated(analysis, user);
+		OwnedEntity.setModified(analysis, user);
+		packet.getAnalyses().add(analysis);
+		analysis.setPacket(packet);
+		return analysis;
 	}
 }
