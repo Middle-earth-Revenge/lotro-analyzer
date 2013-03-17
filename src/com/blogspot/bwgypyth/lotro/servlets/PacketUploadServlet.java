@@ -57,7 +57,7 @@ public class PacketUploadServlet extends HttpServlet {
 		OwnedEntity.setModified(packet, user);
 
 		Analysis analysis = new Analysis();
-		analysis.setName("new Analysis");
+		analysis.setName("Unnamed Analysis");
 		OwnedEntity.setCreated(analysis, user);
 		OwnedEntity.setModified(analysis, user);
 		packet.getAnalyses().add(analysis);

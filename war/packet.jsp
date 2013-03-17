@@ -27,7 +27,7 @@ try {
 		analysis = packet.getAnalyses().get(0);
 	}
 	if (analysis.getKey() == null) {
-		analysis.setName("New Analysis");
+		analysis.setName("Unnamed Analysis");
 		packet.getAnalyses().add(analysis);
 		analysis.setPacket(packet);
 	}

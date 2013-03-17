@@ -25,24 +25,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
+import com.google.appengine.api.datastore.Text;
+
 @Entity
 public class Packet extends OwnedEntity {
 
-	private String data;
+	@Column(name = "data")
+	private Text dataText;
 	private String name;
 	@OneToMany(mappedBy = "packet", cascade = CascadeType.ALL)
 	private List<Analysis> analyses = new ArrayList<>(0);
 
-	public String getData() {
-		return data;
+	public Text getDataText() {
+		return dataText;
 	}
 
+	public void setDataText(Text dataText) {
+		this.dataText = dataText;
+	}
+
+	@Transient
+	public String getData() {
+		if (this.dataText == null) {
+			return null;
+		}
+		return this.dataText.getValue();
+	}
+
+	@Transient
 	public void setData(String data) {
-		this.data = data;
+		this.dataText = data == null ? null : new Text(data);
 	}
 
 	public String getName() {
