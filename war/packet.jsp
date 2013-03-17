@@ -59,6 +59,9 @@ try {
 			#legend div.hoverable {
 				margin: 0 2px;
 			}
+			span.display_header {
+				color: #5c5c5c;
+			}
 <%
 if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 %>
@@ -159,8 +162,8 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 
 				var packet_offset, offset, packet_hex, packet_decoded, legend;
 				offset = 0;
-				packet_offset = '<span class="header">Offset(h)</span><br/>' + padLeadingZeros(offset, 8);
-				packet_hex = '<span class="header">00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F</span><br/>';
+				packet_offset = '<span class="display_header">Offset(h)</span><br/><span class="display_header">' + padLeadingZeros(offset, 8) + '</span>';
+				packet_hex = '<span class="display_header">00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F</span><br/>';
 				packet_decoded = '<br/>';
 				legend = '';
 				for (var i = 0; i < packet.data.length; i+=2) {
@@ -212,8 +215,8 @@ if (user != null) {
 
 					// Add line breaks where necessary
 					if (i % 32 == 30) {
-						offset += 10;
-						packet_offset += '<br/>' + padLeadingZeros(offset, 8);
+						offset += 16;
+						packet_offset += '<br/><span class="display_header">' + padLeadingZeros(offset.toString(16).toUpperCase(), 8) + "</span>";
 						packet_hex += '<br/>';
 						packet_decoded += '<br/>';
 					}
