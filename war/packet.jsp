@@ -56,6 +56,9 @@ try {
 			div#packet_decoded, div#packet_hex {
 				margin-left: 8px;
 			}
+			#legend div.hoverable {
+				margin: 0 2px;
+			}
 <%
 if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 %>
@@ -89,6 +92,10 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 			/* Workaround: autocomplete is behind the dialog */
 			ul.ui-autocomplete {
 				z-index: 101;
+			}
+
+			a.editlink {
+				float: right;
 			}
 <%
 }
@@ -172,7 +179,7 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 <%
 if (user != null) {
 %>
-							+ ' <a href="#" onclick="editAnalysisEntry(\'' + element.name + '\'); return false;">edit</a>'
+							+ ' <a class="editlink" href="#" onclick="editAnalysisEntry(\'' + element.name + '\'); return false;">edit</a>'
 <%
 }
 %>
