@@ -39,7 +39,7 @@ public abstract class AbstractConverter<T> {
 				entity.setCreatedBy(new User(email, authDomain));
 			}
 			if (jsonObject.has("modified")) {
-				entity.setCreated(DatatypeConverter.parseDate(
+				entity.setModified(DatatypeConverter.parseDate(
 						jsonObject.getString("modified")).getTime());
 			}
 			if (jsonObject.has("modifiedBy")) {

@@ -46,4 +46,14 @@ public abstract class OwnedEntity extends Entity {
 		this.modified = modified;
 	}
 
+	public static void setModified(OwnedEntity entity, User user) {
+		entity.setModified(new Date());
+		entity.setModifiedBy(user);
+	}
+
+	public static void setCreated(OwnedEntity entity, User user) {
+		entity.setCreated(new Date());
+		entity.setCreatedBy(user);
+	}
+
 }

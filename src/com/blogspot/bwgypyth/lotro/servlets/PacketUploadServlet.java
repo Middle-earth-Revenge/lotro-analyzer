@@ -1,7 +1,6 @@
 package com.blogspot.bwgypyth.lotro.servlets;
 
 import java.io.IOException;
-import java.util.Date;
 
 import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
@@ -11,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.blogspot.bwgypyth.lotro.EMF;
 import com.blogspot.bwgypyth.lotro.model.Analysis;
+import com.blogspot.bwgypyth.lotro.model.OwnedEntity;
 import com.blogspot.bwgypyth.lotro.model.Packet;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
@@ -31,18 +31,14 @@ public class PacketUploadServlet extends HttpServlet {
 		}
 		packet.setName(req.getParameter("name"));
 		packet.setData(req.getParameter("data").replace(" ", "")
-				.replace("\r", "").replace("\n", ""));
-		packet.setCreatedBy(user);
-		packet.setCreated(new Date());
-		packet.setModifiedBy(user);
-		packet.setModified(packet.getCreated());
+				.replace("\r", "").replace("\n", "").toUpperCase());
+		OwnedEntity.setCreated(packet, user);
+		OwnedEntity.setModified(packet, user);
 
 		Analysis analysis = new Analysis();
 		analysis.setName("new Analysis");
-		analysis.setCreatedBy(user);
-		analysis.setCreated(new Date());
-		analysis.setModifiedBy(user);
-		analysis.setModified(analysis.getCreated());
+		OwnedEntity.setCreated(analysis, user);
+		OwnedEntity.setModified(analysis, user);
 		packet.getAnalyses().add(analysis);
 		analysis.setPacket(packet);
 

@@ -1,7 +1,6 @@
 package com.blogspot.bwgypyth.lotro.servlets;
 
 import java.io.IOException;
-import java.util.Date;
 
 import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
@@ -12,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.blogspot.bwgypyth.lotro.EMF;
 import com.blogspot.bwgypyth.lotro.json.IncludeUserdata;
 import com.blogspot.bwgypyth.lotro.json.PacketConverter;
+import com.blogspot.bwgypyth.lotro.model.OwnedEntity;
 import com.blogspot.bwgypyth.lotro.model.Packet;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
@@ -52,10 +52,8 @@ public class PacketImportServlet extends HttpServlet {
 		try {
 			Packet packet = new PacketConverter(IncludeUserdata.INCLUDE_ALL)
 					.fromJson(new JSONObject(packetData));
-			packet.setCreatedBy(user);
-			packet.setCreated(new Date());
-			packet.setModifiedBy(user);
-			packet.setModified(packet.getCreated());
+			OwnedEntity.setCreated(packet, user);
+			OwnedEntity.setModified(packet, user);
 
 			em.merge(packet);
 

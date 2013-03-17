@@ -2,7 +2,6 @@ package com.blogspot.bwgypyth.lotro.servlets;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +21,7 @@ import net.sf.jsr107cache.CacheManager;
 import com.blogspot.bwgypyth.lotro.EMF;
 import com.blogspot.bwgypyth.lotro.model.Analysis;
 import com.blogspot.bwgypyth.lotro.model.AnalysisEntry;
+import com.blogspot.bwgypyth.lotro.model.OwnedEntity;
 import com.blogspot.bwgypyth.lotro.model.Packet;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
@@ -64,8 +64,7 @@ public class PacketAjaxServlet extends HttpServlet {
 				try {
 					Packet packet = em.find(Packet.class, packetKey);
 					packet.setName(packetName);
-					packet.setModified(new Date());
-					packet.setModifiedBy(user);
+					OwnedEntity.setModified(packet, user);
 					em.merge(packet);
 				} finally {
 					em.close();
@@ -85,13 +84,22 @@ public class PacketAjaxServlet extends HttpServlet {
 									KeyFactory.createKey("Packet", packetKey),
 									"Analysis", analysisKey));
 					analysis.setName(packetName);
-					analysis.setModified(new Date());
-					analysis.setModifiedBy(user);
+					OwnedEntity.setModified(analysis, user);
 					em.merge(analysis);
 				} finally {
 					em.close();
 				}
 				resp.getOutputStream().print("ok");
+				break;
+			}
+			case "create_analysis": {
+				EntityManager em = EMF.get().createEntityManager();
+				try {
+					Analysis analysis = new Analysis();
+					OwnedEntity.setModified(analysis, user);
+				} finally {
+					em.close();
+				}
 				break;
 			}
 			case "update_analysisentry": {
@@ -160,8 +168,7 @@ public class PacketAjaxServlet extends HttpServlet {
 							.createKey(
 									KeyFactory.createKey("Packet", packetKey),
 									"Analysis", analysisKey));
-					analysis.setModified(new Date());
-					analysis.setModifiedBy(user);
+					OwnedEntity.setModified(analysis, user);
 
 					for (AnalysisEntry analysisEntry : analysis
 							.getAnalysisEntries()) {
@@ -172,8 +179,7 @@ public class PacketAjaxServlet extends HttpServlet {
 					}
 
 					AnalysisEntry analysisEntry = new AnalysisEntry();
-					analysisEntry.setCreatedBy(user);
-					analysisEntry.setCreated(new Date());
+					OwnedEntity.setCreated(analysisEntry, user);
 					setAnalysisData(user, start, end, description, color,
 							foregroundColor, name, analysisEntry);
 					analysis.getAnalysisEntries().add(analysisEntry);
@@ -270,7 +276,6 @@ public class PacketAjaxServlet extends HttpServlet {
 		analysisEntry.setDescription(description);
 		analysisEntry.setStart(start);
 		analysisEntry.setEnd(end);
-		analysisEntry.setModifiedBy(user);
-		analysisEntry.setModified(new Date());
+		OwnedEntity.setModified(analysisEntry, user);
 	}
 }
