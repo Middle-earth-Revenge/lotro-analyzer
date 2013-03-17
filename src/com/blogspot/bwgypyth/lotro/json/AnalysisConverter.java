@@ -23,27 +23,24 @@ package com.blogspot.bwgypyth.lotro.json;
 
 import com.blogspot.bwgypyth.lotro.model.Analysis;
 import com.blogspot.bwgypyth.lotro.model.AnalysisEntry;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
 
 public class AnalysisConverter extends AbstractConverter<Analysis> {
 
-	public AnalysisConverter(IncludeUserdata includeUserdata) {
-		super(includeUserdata);
+	public AnalysisConverter(IncludeUserdata includeUserdata,
+			IncludeKey includeKey) {
+		super(includeUserdata, includeKey);
 	}
 
 	@Override
 	public Analysis fromJson(JSONObject jsonObject) throws JSONException {
 		AnalysisEntryConverter analysisEntryConverter = new AnalysisEntryConverter(
-				includeUserdata);
+				includeUserdata, includeKey);
 
 		Analysis entity = new Analysis();
-		if (jsonObject.has("key")) {
-			entity.setKey(KeyFactory.createKey("Analysis",
-					jsonObject.getLong("key")));
-		}
+		keyFromJson(jsonObject, entity);
 		entity.setName(jsonObject.getString("name"));
 		userdataFromJson(jsonObject, entity);
 		JSONArray jsonArray = jsonObject.getJSONArray("analysisEntries");
@@ -60,14 +57,10 @@ public class AnalysisConverter extends AbstractConverter<Analysis> {
 	@Override
 	public JSONObject toJson(Analysis entity) throws JSONException {
 		AnalysisEntryConverter analysisEntryConverter = new AnalysisEntryConverter(
-				includeUserdata);
+				includeUserdata, includeKey);
 
 		JSONObject jsonObject = new JSONObject();
-		if (entity.getKey() != null) {
-			jsonObject.put("key", entity.getKey().getId());
-		} else {
-			jsonObject.put("key", "");
-		}
+		keyToJson(jsonObject, entity);
 		jsonObject.put("name", entity.getName());
 		userdataToJson(jsonObject, entity);
 		JSONArray jsonArray = new JSONArray();

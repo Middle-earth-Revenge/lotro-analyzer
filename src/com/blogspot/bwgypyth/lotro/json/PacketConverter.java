@@ -23,27 +23,24 @@ package com.blogspot.bwgypyth.lotro.json;
 
 import com.blogspot.bwgypyth.lotro.model.Analysis;
 import com.blogspot.bwgypyth.lotro.model.Packet;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
 
 public class PacketConverter extends AbstractConverter<Packet> {
 
-	public PacketConverter(IncludeUserdata includeUserdata) {
-		super(includeUserdata);
+	public PacketConverter(IncludeUserdata includeUserdata,
+			IncludeKey includeKey) {
+		super(includeUserdata, includeKey);
 	}
 
 	@Override
 	public Packet fromJson(JSONObject jsonObject) throws JSONException {
 		AnalysisConverter analysisConverter = new AnalysisConverter(
-				includeUserdata);
+				includeUserdata, includeKey);
 
 		Packet entity = new Packet();
-		if (jsonObject.has("key")) {
-			entity.setKey(KeyFactory.createKey("Packet",
-					jsonObject.getLong("key")));
-		}
+		keyFromJson(jsonObject, entity);
 		entity.setData(jsonObject.getString("data"));
 		entity.setName(jsonObject.getString("name"));
 		userdataFromJson(jsonObject, entity);
@@ -61,14 +58,10 @@ public class PacketConverter extends AbstractConverter<Packet> {
 	@Override
 	public JSONObject toJson(Packet entity) throws JSONException {
 		AnalysisConverter analysisConverter = new AnalysisConverter(
-				includeUserdata);
+				includeUserdata, includeKey);
 
 		JSONObject jsonObject = new JSONObject();
-		if (entity.getKey() != null) {
-			jsonObject.put("key", entity.getKey().getId());
-		} else {
-			jsonObject.put("key", "");
-		}
+		keyToJson(jsonObject, entity);
 		jsonObject.put("data", entity.getData());
 		jsonObject.put("name", entity.getName());
 		userdataToJson(jsonObject, entity);

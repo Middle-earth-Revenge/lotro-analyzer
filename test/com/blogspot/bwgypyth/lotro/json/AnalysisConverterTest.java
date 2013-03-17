@@ -12,7 +12,8 @@ public class AnalysisConverterTest {
 
 	@Before
 	public void before() {
-		converter = new AnalysisConverter(IncludeUserdata.INCLUDE_NONE);
+		converter = new AnalysisConverter(IncludeUserdata.INCLUDE_NONE,
+				IncludeKey.INCLUDE_NONE);
 	}
 
 	@Test

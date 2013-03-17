@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.blogspot.bwgypyth.lotro.EMF;
+import com.blogspot.bwgypyth.lotro.json.IncludeKey;
 import com.blogspot.bwgypyth.lotro.json.IncludeUserdata;
 import com.blogspot.bwgypyth.lotro.json.PacketConverter;
 import com.blogspot.bwgypyth.lotro.model.Packet;
@@ -46,13 +47,16 @@ public class PacketExportServlet extends HttpServlet {
 			throw new ServletException("Missing parameter 'packet'");
 		}
 		Long packetKey = Long.valueOf(req.getParameter("packet"));
+		IncludeKey includeKey = Boolean.valueOf(req.getParameter("includeKey"))
+				.booleanValue() ? IncludeKey.INCLUDE_ALL
+				: IncludeKey.INCLUDE_NONE;
 		EntityManager em = EMF.get().createEntityManager();
 		try {
 			Packet packet = em.find(Packet.class, packetKey);
 			resp.setContentType("application/json");
-			resp.getOutputStream().print(
-					new PacketConverter(IncludeUserdata.INCLUDE_ALL).toJson(
-							packet).toString());
+			resp.getOutputStream()
+					.print(new PacketConverter(IncludeUserdata.INCLUDE_ALL,
+							includeKey).toJson(packet).toString());
 		} catch (JSONException e) {
 			throw new ServletException(e.getMessage(), e);
 		} finally {

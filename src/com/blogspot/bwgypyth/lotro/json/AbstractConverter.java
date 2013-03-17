@@ -26,6 +26,7 @@ import java.util.Calendar;
 import javax.xml.bind.DatatypeConverter;
 
 import com.blogspot.bwgypyth.lotro.model.OwnedEntity;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.users.User;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
@@ -40,9 +41,12 @@ import com.google.appengine.labs.repackaged.org.json.JSONObject;
 public abstract class AbstractConverter<T extends OwnedEntity> {
 
 	protected final IncludeUserdata includeUserdata;
+	protected final IncludeKey includeKey;
 
-	public AbstractConverter(IncludeUserdata includeUserdata) {
+	public AbstractConverter(IncludeUserdata includeUserdata,
+			IncludeKey includeKey) {
 		this.includeUserdata = includeUserdata;
+		this.includeKey = includeKey;
 	}
 
 	/**
@@ -111,6 +115,21 @@ public abstract class AbstractConverter<T extends OwnedEntity> {
 		}
 	}
 
+	protected final void keyFromJson(JSONObject jsonObject, OwnedEntity entity)
+			throws JSONException {
+		switch (includeKey) {
+		case INCLUDE_ALL:
+			if (jsonObject.has("key")) {
+				entity.setKey(KeyFactory.createKey("Analysis",
+						jsonObject.getLong("key")));
+			}
+			break;
+		default:
+		case INCLUDE_NONE:
+			break;
+		}
+	}
+
 	/**
 	 * Copies the userdata into the JSON object if constructed using
 	 * {@link IncludeUserdata#INCLUDE_ALL}.
@@ -143,6 +162,22 @@ public abstract class AbstractConverter<T extends OwnedEntity> {
 			if (entity.getModifiedBy() != null) {
 				jsonObject.put("modifiedBy", entity.getModifiedBy().getEmail()
 						+ "|" + entity.getModifiedBy().getAuthDomain());
+			}
+			break;
+		default:
+		case INCLUDE_NONE:
+			break;
+		}
+	}
+
+	protected final void keyToJson(JSONObject jsonObject, OwnedEntity entity)
+			throws JSONException {
+		switch (includeKey) {
+		case INCLUDE_ALL:
+			if (entity.getKey() != null) {
+				jsonObject.put("key", entity.getKey().getId());
+			} else {
+				jsonObject.put("key", "");
 			}
 			break;
 		default:
