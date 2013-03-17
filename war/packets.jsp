@@ -23,6 +23,7 @@ try {
 				<tr>
 					<th>Packet</th>
 					<th>No. of analyses</th>
+					<th>Actions</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -33,6 +34,7 @@ for (Packet packet : packets) {
 				<tr>
 					<td><a href="packet.jsp?packet=${packet.key.id}">${packet.name}</a></td>
 					<td>${packet.analysesSize}</td>
+					<td><a href="/export/packet?packet=${packet.key.id}">Export</a></td>
 				</tr>
 <%
 }
@@ -43,7 +45,7 @@ if (user != null) {
 %>
 			<tfoot>
 				<tr>
-					<td><a href="packet_upload.jsp">Upload packet</a></td>
+					<td colspan="3"><a href="packet_upload.jsp">Upload packet</a></td>
 				</tr>
 			</tfoot>
 <%
