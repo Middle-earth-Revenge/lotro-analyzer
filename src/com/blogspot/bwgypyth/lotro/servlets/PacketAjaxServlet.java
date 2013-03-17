@@ -22,6 +22,7 @@
 package com.blogspot.bwgypyth.lotro.servlets;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -227,7 +228,7 @@ public class PacketAjaxServlet extends HttpServlet {
 						"select distinct entry.color from AnalysisEntry entry")
 						.getResultList();
 
-				cache.put(CACHE_KEY_COLORS, colors);
+				cache.put(CACHE_KEY_COLORS, new ArrayList<>(colors));
 				out.print(getMatchingColors(colors, term));
 			} finally {
 				em.close();

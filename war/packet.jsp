@@ -222,7 +222,7 @@ if (user != null) {
 
 				var packetName = '<span id="packet_name">' + packet.name + '</span>';
 <%
-if (userService.isUserAdmin()) {
+if (user != null && userService.isUserAdmin()) {
 %>
 				packetName += ' <a href="#" onclick="deletePacket(' + packet.key + '); return false;">delete</a>';
 <%
@@ -230,7 +230,7 @@ if (userService.isUserAdmin()) {
 %>
 				var analysisName = '<span id="analysis_name">' + analysis.name + '</span>';
 <%
-if (userService.isUserAdmin()) {
+if (user != null && userService.isUserAdmin()) {
 %>
 				analysisName += ' <a href="#" onclick="deleteAnalysis(' + packet.key + ',' + analysis.key + '); return false;">delete</a>';
 <%
