@@ -45,7 +45,7 @@ if (user != null) {
 %>
 			<tfoot>
 				<tr>
-					<td colspan="3"><a href="packet_upload.jsp">Upload packet</a></td>
+					<td colspan="3"><a href="packet_upload.jsp">Upload packet</a> <a href="/import/packet">Import packet in JSON format</a></td>
 				</tr>
 			</tfoot>
 <%
