@@ -254,8 +254,16 @@ if (user != null && userService.isUserAdmin()) {
 if (user != null) {
 %>
 				$('.decoded_or_hex_element').click(function() {
-					var hex_element_current = this.id.substring(12);
-					$(this).addClass("decoded_or_hex_element_selected");
+					var hex_element_current;
+					if (this.id.indexOf("hex_element_") == 0) {
+						hex_element_current = this.id.substring(12);
+					} else if (this.id.indexOf("decoded_element_") == 0) {
+						hex_element_current = this.id.substring(16);
+					} else {
+						return;
+					}
+					$('#hex_element_' + hex_element_current).addClass("decoded_or_hex_element_selected");
+					$('#decoded_element_' + hex_element_current).addClass("decoded_or_hex_element_selected");
 					if (hex_element_start == undefined) {
 						hex_element_start = hex_element_current;
 					} else {
