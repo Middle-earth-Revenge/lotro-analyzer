@@ -13,7 +13,7 @@ try {
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title></title>
+		<title>Available packets</title>
 		<link rel="stylesheet" href="css/file.css">
 	</head>
 	<body>
