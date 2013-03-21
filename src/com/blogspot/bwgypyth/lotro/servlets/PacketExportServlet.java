@@ -25,7 +25,6 @@ import java.io.IOException;
 
 import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -65,10 +64,10 @@ public class PacketExportServlet extends HttpServlet {
 								includeKey).toJson(packet).toString());
 				break;
 			case BINARY:
-				ServletOutputStream out = resp.getOutputStream();
+				resp.setContentType("application/octet-stream");
 				String data = packet.getData();
 				byte[] hexStringToByteArray = hexStringToByteArray(data);
-				out.write(hexStringToByteArray);
+				resp.getOutputStream().write(hexStringToByteArray);
 				break;
 			default:
 				throw new ServletException("Unknown type " + exportType);
