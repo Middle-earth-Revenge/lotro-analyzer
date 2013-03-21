@@ -200,7 +200,7 @@ public class Analysis extends OwnedEntity {
 		analysisEntry.setName("data");
 		analysisEntry.setStart(0x14);
 		analysisEntry.setEnd(analysis.getPacket().getData().length());
-		analysisEntry.setColor("#aaaaaa");
+		analysisEntry.setColor("#777777");
 		analysisEntry.setDescription("<b>Data</b>");
 		analysisEntry.setAnalysis(analysis);
 		OwnedEntity.setCreated(analysisEntry, user);
