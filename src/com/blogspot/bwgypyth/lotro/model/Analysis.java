@@ -144,7 +144,7 @@ public class Analysis extends OwnedEntity {
 			AnalysisEntry analysisEntry = new AnalysisEntry();
 			analysisEntry.setName("data_offset");
 			analysisEntry.setStart(0x14);
-			analysisEntry.setEnd(0x18);
+			analysisEntry.setEnd(0x19);
 			analysisEntry.setColor("#FFFF00");
 			analysisEntry.setDescription("Padding (see 0x04)");
 			analysisEntry.setAnalysis(analysis);
