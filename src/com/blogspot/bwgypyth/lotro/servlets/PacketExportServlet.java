@@ -25,11 +25,13 @@ import java.io.IOException;
 
 import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.blogspot.bwgypyth.lotro.EMF;
+import com.blogspot.bwgypyth.lotro.json.ExportType;
 import com.blogspot.bwgypyth.lotro.json.IncludeKey;
 import com.blogspot.bwgypyth.lotro.json.IncludeUserdata;
 import com.blogspot.bwgypyth.lotro.json.PacketConverter;
@@ -50,17 +52,41 @@ public class PacketExportServlet extends HttpServlet {
 		IncludeKey includeKey = Boolean.valueOf(req.getParameter("includeKey"))
 				.booleanValue() ? IncludeKey.INCLUDE_ALL
 				: IncludeKey.INCLUDE_NONE;
+		ExportType exportType = "binary".equals(req.getParameter("type")) ? ExportType.BINARY
+				: ExportType.JSON;
 		EntityManager em = EMF.get().createEntityManager();
 		try {
 			Packet packet = em.find(Packet.class, packetKey);
-			resp.setContentType("application/json");
-			resp.getOutputStream()
-					.print(new PacketConverter(IncludeUserdata.INCLUDE_ALL,
-							includeKey).toJson(packet).toString());
+			switch (exportType) {
+			case JSON:
+				resp.setContentType("application/json");
+				resp.getOutputStream().print(
+						new PacketConverter(IncludeUserdata.INCLUDE_ALL,
+								includeKey).toJson(packet).toString());
+				break;
+			case BINARY:
+				ServletOutputStream out = resp.getOutputStream();
+				String data = packet.getData();
+				byte[] hexStringToByteArray = hexStringToByteArray(data);
+				out.write(hexStringToByteArray);
+				break;
+			default:
+				throw new ServletException("Unknown type " + exportType);
+			}
 		} catch (JSONException e) {
 			throw new ServletException(e.getMessage(), e);
 		} finally {
 			em.close();
 		}
+	}
+
+	public static byte[] hexStringToByteArray(String s) {
+		int len = s.length();
+		byte[] data = new byte[len / 2];
+		for (int i = 0; i < len; i += 2) {
+			data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character
+					.digit(s.charAt(i + 1), 16));
+		}
+		return data;
 	}
 }

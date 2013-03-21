@@ -34,7 +34,7 @@ for (Packet packet : packets) {
 				<tr>
 					<td><a href="packet.jsp?packet=${packet.key.id}">${packet.name}</a></td>
 					<td>${packet.analysesSize}</td>
-					<td><a href="/export/packet?packet=${packet.key.id}">Export</a></td>
+					<td><a href="/export/packet?packet=${packet.key.id}">Export</a> <a href="/export/packet?packet=${packet.key.id}&amp;type=binary">Export binary</a></td>
 				</tr>
 <%
 }

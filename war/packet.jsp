@@ -241,7 +241,7 @@ if (user != null && userService.isUserAdmin()) {
 }
 %>
 
-				$('#name').html('<h1>' + packetName + ' - ' + analysisName + '</h1><a href="/export/packet?packet=' + packet.key + '">Export</a>');
+				$('#name').html('<h1>' + packetName + ' - ' + analysisName + '</h1><a href="/export/packet?packet=' + packet.key + '">Export</a> <a href="/export/packet?packet=' + packet.key + '&amp;type=binary">Export binary</a>');
 				$('#packet_offset').html(packet_offset);
 				$('#packet_hex').html(packet_hex);
 				$('#packet_decoded').html(packet_decoded);
