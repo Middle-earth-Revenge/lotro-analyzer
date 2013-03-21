@@ -158,7 +158,7 @@ public class Analysis extends OwnedEntity {
 				analysisEntry.setStart(0x04);
 				analysisEntry.setEnd(0x04);
 				analysisEntry.setColor("#FFFF00");
-				analysisEntry.setDescription("Padding (see 0x14 to 0x18)");
+				analysisEntry.setDescription("Padding (see 0x14 to 0x19)");
 				analysisEntry.setAnalysis(analysis);
 				OwnedEntity.setCreated(analysisEntry, user);
 				OwnedEntity.setModified(analysisEntry, user);
