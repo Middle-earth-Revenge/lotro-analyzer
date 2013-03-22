@@ -41,8 +41,8 @@ try {
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>${packet.name} - ${analysis.name}</title>
 		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
-		<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-		<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 		<style type="text/css">
 			div#packet_offset, div#packet_hex, div#packet_decoded {
 				font-family: monospace;
