@@ -352,7 +352,7 @@ if (user != null) {
 					'<tr><th>Description*</th><td><textarea id="entry_description" rows="4" cols="30" style="width: 250px;">' + description +'</textarea></td><td class="description">Human readable description of this datapart</td></tr>' +
 					'<tr><th>Color*</th><td><div class="ui-widget"><input type="text" id="entry_color" value="' + color +'" style="width: 250px;" /></div></td><td class="description">Color to be used for this datapart</td></tr>' +
 					'<tr><th>Foregroundcolor</th><td><div class="ui-widget"><input type="text" id="entry_foregroundcolor" value="' + (foregroundcolor == undefined ? '' : foregroundcolor) +'" style="width: 250px;" /></div></td><td class="description">Foregroundcolor to be used for this datapart (optional)</td></tr>' +
-					'<tr><td></td><td><input type="button" onclick="submitAnalysisEntry();" value="save" />';
+					'<tr><td></td><td><input type="button" onclick="submitAnalysisEntry(this);" value="save" />';
 				if (key && key != '') {
 					retval += '<input type="hidden" id="entry_key" value="' + key + '" />'
 				}
@@ -361,7 +361,7 @@ if (user != null) {
 				return retval;
 			}
 
-			function submitAnalysisEntry() {
+			function submitAnalysisEntry(saveButton) {
 				var editdata = {
 					"operation": "create_analysisentry",
 					"analysis_key": analysis.key,
@@ -377,10 +377,14 @@ if (user != null) {
 					editdata['entry_key'] = $('#entry_key').val();
 					editdata['operation'] = 'update_analysisentry';
 				}
+				$(saveButton).attr('disabled', 'disabled');
+				$('body').css('cursor', 'progress');
 				$.ajax({
 					url: "packet_ajax",
 					data: editdata
 				}).done(function(data) {
+					$(saveButton).removeAttr('disabled');
+					$('body').css('cursor', 'auto');
 					if (data == 'ok') {
 						// Reload page
 						window.location.reload();

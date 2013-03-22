@@ -56,3 +56,7 @@ body {
 	top: 40px;
 	padding: 3px;
 }
+
+.ui-autocomplete-loading {
+	background: white url('../i_ajax_loader.gif') right center no-repeat;
+}
