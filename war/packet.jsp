@@ -149,6 +149,10 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 				});
 			}
 
+			function integerToHexString(integer) {
+				return padLeadingZeros(integer.toString(16).toUpperCase(), 4);
+			}
+
 			function renderPacket() {
 
 				// Generate CSS classes for all known analysis entries
@@ -168,7 +172,7 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) {
 				packet_decoded = '<br/>';
 				legend = '';
 				for (var i = 0; i < packet.data.length; i+=2) {
-					var hexOffset = padLeadingZeros((i/2).toString(16).toUpperCase(), 2);
+					var hexOffset = integerToHexString(i / 2);
 
 					// Check if the current byte is a starting byte of any analysis entry
 					$(analysis.analysisEntries).each(function(index, element) {
@@ -316,7 +320,7 @@ if (user != null) {
 				});
 
 				var analysis_entry = $('#analysis_entry');
-				analysis_entry.html(getAnalysisEntryDialogContent(entryToEdit.key, entryToEdit.name,  padLeadingZeros(entryToEdit.start.toString(16).toUpperCase(), 2), padLeadingZeros(entryToEdit.end.toString(16).toUpperCase(), 2), entryToEdit.description, entryToEdit.color, entryToEdit.foregroundColor));
+				analysis_entry.html(getAnalysisEntryDialogContent(entryToEdit.key, entryToEdit.name,  integerToHexString(entryToEdit.start), integerToHexString(entryToEdit.end), entryToEdit.description, entryToEdit.color, entryToEdit.foregroundColor));
 				$('#entry_color').htmlautocomplete({
 					source: "packet_ajax?operation=autocomplete_color",
 					minLength: 1
