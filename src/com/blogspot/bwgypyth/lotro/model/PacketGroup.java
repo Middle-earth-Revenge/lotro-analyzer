@@ -25,47 +25,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Transient;
-
-import com.google.appengine.api.datastore.Text;
-import com.google.appengine.datanucleus.annotations.Unowned;
 
 @Entity
-public class Packet extends OwnedEntity {
+public class PacketGroup extends OwnedEntity {
 
-	@Column(name = "data")
-	private Text dataText;
 	private String name;
-	@ManyToOne
-	@Unowned
-	private PacketGroup group;
-	@OneToMany(mappedBy = "packet", cascade = CascadeType.ALL)
-	private List<Analysis> analyses = new ArrayList<>(0);
+	private String description;
 
-	public Text getDataText() {
-		return dataText;
-	}
-
-	public void setDataText(Text dataText) {
-		this.dataText = dataText;
-	}
-
-	@Transient
-	public String getData() {
-		if (this.dataText == null) {
-			return null;
-		}
-		return this.dataText.getValue();
-	}
-
-	@Transient
-	public void setData(String data) {
-		this.dataText = data == null ? null : new Text(data);
-	}
+	@OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+	private List<Packet> packets = new ArrayList<>(0);
 
 	public String getName() {
 		return name;
@@ -75,25 +45,20 @@ public class Packet extends OwnedEntity {
 		this.name = name;
 	}
 
-	public PacketGroup getGroup() {
-		return group;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setGroup(PacketGroup group) {
-		this.group = group;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
-	public List<Analysis> getAnalyses() {
-		return analyses;
+	public List<Packet> getPackets() {
+		return packets;
 	}
 
-	@Transient
-	public int getAnalysesSize() {
-		return getAnalyses().size();
-	}
-
-	public void setAnalyses(List<Analysis> analyses) {
-		this.analyses = analyses;
+	public void setPackets(List<Packet> packets) {
+		this.packets = packets;
 	}
 
 }

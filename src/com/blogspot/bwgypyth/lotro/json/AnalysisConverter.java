@@ -23,6 +23,7 @@ package com.blogspot.bwgypyth.lotro.json;
 
 import com.blogspot.bwgypyth.lotro.model.Analysis;
 import com.blogspot.bwgypyth.lotro.model.AnalysisEntry;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
@@ -70,6 +71,23 @@ public class AnalysisConverter extends AbstractConverter<Analysis> {
 		jsonObject.put("analysisEntries", jsonArray);
 
 		return jsonObject;
+	}
+
+	protected void keyFromJson(JSONObject jsonObject, Analysis entity)
+			throws JSONException {
+		switch (includeKey) {
+		case INCLUDE_ALL:
+			if (jsonObject.has("key")) {
+				entity.setKey(KeyFactory.createKey(
+						KeyFactory.createKey("Packet",
+								jsonObject.getLong("parent_key")), "Analysis",
+						jsonObject.getLong("key")));
+			}
+			break;
+		default:
+		case INCLUDE_NONE:
+			break;
+		}
 	}
 
 }

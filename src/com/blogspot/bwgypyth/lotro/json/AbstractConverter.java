@@ -21,13 +21,15 @@
  */
 package com.blogspot.bwgypyth.lotro.json;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.xml.bind.DatatypeConverter;
 
 import com.blogspot.bwgypyth.lotro.model.OwnedEntity;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.users.User;
+import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
 
@@ -60,6 +62,14 @@ public abstract class AbstractConverter<T extends OwnedEntity> {
 	 */
 	public abstract T fromJson(JSONObject jsonObject) throws JSONException;
 
+	public final List<T> fromJson(JSONArray jsonArray) throws JSONException {
+		List<T> retval = new ArrayList<>(jsonArray.length());
+		for (int i = 0; i < jsonArray.length(); i++) {
+			retval.add(fromJson(jsonArray.getJSONObject(i)));
+		}
+		return retval;
+	}
+
 	/**
 	 * Convert an entity into a JSON object.
 	 * 
@@ -70,6 +80,14 @@ public abstract class AbstractConverter<T extends OwnedEntity> {
 	 *             thrown when the conversion failed
 	 */
 	public abstract JSONObject toJson(T entity) throws JSONException;
+
+	public final JSONArray toJson(List<T> entities) throws JSONException {
+		JSONArray jsonArray = new JSONArray();
+		for (T entity : entities) {
+			jsonArray.put(toJson(entity));
+		}
+		return jsonArray;
+	}
 
 	/**
 	 * If converter was constucted using {@link IncludeUserdata#INCLUDE_ALL}
@@ -115,20 +133,8 @@ public abstract class AbstractConverter<T extends OwnedEntity> {
 		}
 	}
 
-	protected final void keyFromJson(JSONObject jsonObject, OwnedEntity entity)
-			throws JSONException {
-		switch (includeKey) {
-		case INCLUDE_ALL:
-			if (jsonObject.has("key")) {
-				entity.setKey(KeyFactory.createKey("Analysis",
-						jsonObject.getLong("key")));
-			}
-			break;
-		default:
-		case INCLUDE_NONE:
-			break;
-		}
-	}
+	protected abstract void keyFromJson(JSONObject jsonObject, T entity)
+			throws JSONException;
 
 	/**
 	 * Copies the userdata into the JSON object if constructed using
@@ -176,6 +182,14 @@ public abstract class AbstractConverter<T extends OwnedEntity> {
 		case INCLUDE_ALL:
 			if (entity.getKey() != null) {
 				jsonObject.put("key", entity.getKey().getId());
+				if (entity.getKey().getParent() != null) {
+					jsonObject.put("parent_key", entity.getKey().getParent()
+							.getId());
+					if (entity.getKey().getParent().getParent() != null) {
+						jsonObject.put("parent_parent_key", entity.getKey()
+								.getParent().getParent().getId());
+					}
+				}
 			} else {
 				jsonObject.put("key", "");
 			}

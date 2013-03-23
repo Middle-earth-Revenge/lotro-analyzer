@@ -60,3 +60,7 @@ body {
 .ui-autocomplete-loading {
 	background: white url('../i_ajax_loader.gif') right center no-repeat;
 }
+
+.ui-widget {
+	font-size: 0.8em
+}

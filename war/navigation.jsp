@@ -7,7 +7,7 @@ UserService userService = UserServiceFactory.getUserService();
 User user = userService.getCurrentUser();
 %>
 <nav class="navigation">
-	<a href="packets.jsp">Packets</a>
+	<a href="packets.jsp" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only ui-state-focus"><span class="ui-button-text">Packets</span></a>
 <%
 StringBuffer currentUrl = request.getRequestURL();
 if (request.getQueryString() != null) {
@@ -15,11 +15,11 @@ if (request.getQueryString() != null) {
 }
 if (user != null) {
 %>
-	<a href="<%= userService.createLogoutURL(currentUrl.toString()) %>">Sign out <%= user.getNickname() %></a>
+	<a href="<%= userService.createLogoutURL(currentUrl.toString()) %>" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><span class="ui-button-text">Sign out <%= user.getNickname() %></span></a>
 <%
 } else {
 %>
-	<a href="<%=userService.createLoginURL(currentUrl.toString())%>">Sign in</a>
+	<a href="<%=userService.createLoginURL(currentUrl.toString())%>" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><span class="ui-button-text">Sign in</span></a>
 <%
 }
 %>

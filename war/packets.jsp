@@ -1,3 +1,4 @@
+<%@page import="com.blogspot.bwgypyth.lotro.model.PacketGroup"%>
 <%@page import="com.google.appengine.api.users.UserService"%>
 <%@page import="java.util.List"%>
 <%@page import="com.blogspot.bwgypyth.lotro.model.Packet"%>
@@ -7,17 +8,19 @@
 <%
 EntityManager em = EMF.get().createEntityManager();
 try {
-	List<Packet> packets = em.createQuery("select packet from Packet packet order by name").getResultList();
+	List<Packet> packets = em.createQuery("select packet from Packet packet order by packet.group, packet.name").getResultList();
 %>
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>Available packets</title>
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
 		<link rel="stylesheet" href="css/file.css">
 	</head>
 	<body>
 		<%@ include file="navigation.jsp" %>
+		<h1>Available packets</h1>
 		<table>
 			<thead>
 				<tr>
@@ -28,7 +31,17 @@ try {
 			</thead>
 			<tbody>
 <%
+PacketGroup group = null;
 for (Packet packet : packets) {
+	if ((group == null && packet.getGroup() != null) || (group != null && !group.equals(packet.getGroup()))) {
+		group = packet.getGroup();
+		pageContext.setAttribute("group", group);
+%>
+				<tr>
+					<td colspan="3">${group.name}</td>
+				</tr>
+<%
+	}
 	pageContext.setAttribute("packet", packet);
 %>
 				<tr>

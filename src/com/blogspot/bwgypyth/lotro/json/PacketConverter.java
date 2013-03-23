@@ -23,6 +23,8 @@ package com.blogspot.bwgypyth.lotro.json;
 
 import com.blogspot.bwgypyth.lotro.model.Analysis;
 import com.blogspot.bwgypyth.lotro.model.Packet;
+import com.blogspot.bwgypyth.lotro.model.PacketGroup;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
@@ -43,6 +45,12 @@ public class PacketConverter extends AbstractConverter<Packet> {
 		keyFromJson(jsonObject, entity);
 		entity.setData(jsonObject.getString("data"));
 		entity.setName(jsonObject.getString("name"));
+		if (jsonObject.has("group")) {
+			PacketGroup group = new PacketGroup();
+			group.setKey(KeyFactory.createKey("PacketGroup",
+					jsonObject.getLong("group")));
+			entity.setGroup(group);
+		}
 		userdataFromJson(jsonObject, entity);
 		JSONArray jsonArray = jsonObject.getJSONArray("analyses");
 		for (int i = 0; i < jsonArray.length(); i++) {
@@ -64,6 +72,9 @@ public class PacketConverter extends AbstractConverter<Packet> {
 		keyToJson(jsonObject, entity);
 		jsonObject.put("data", entity.getData());
 		jsonObject.put("name", entity.getName());
+		if (entity.getGroup() != null) {
+			jsonObject.put("group", entity.getGroup().getKey().getId());
+		}
 		userdataToJson(jsonObject, entity);
 		JSONArray jsonArray = new JSONArray();
 		for (Analysis analysis : entity.getAnalyses()) {
@@ -72,6 +83,21 @@ public class PacketConverter extends AbstractConverter<Packet> {
 		jsonObject.put("analyses", jsonArray);
 
 		return jsonObject;
+	}
+
+	protected void keyFromJson(JSONObject jsonObject, Packet entity)
+			throws JSONException {
+		switch (includeKey) {
+		case INCLUDE_ALL:
+			if (jsonObject.has("key")) {
+				entity.setKey(KeyFactory.createKey(
+						Packet.class.getSimpleName(), jsonObject.getLong("key")));
+			}
+			break;
+		default:
+		case INCLUDE_NONE:
+			break;
+		}
 	}
 
 }

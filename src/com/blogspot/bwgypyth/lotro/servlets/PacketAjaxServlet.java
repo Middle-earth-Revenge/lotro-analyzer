@@ -47,6 +47,7 @@ import com.blogspot.bwgypyth.lotro.model.Analysis;
 import com.blogspot.bwgypyth.lotro.model.AnalysisEntry;
 import com.blogspot.bwgypyth.lotro.model.OwnedEntity;
 import com.blogspot.bwgypyth.lotro.model.Packet;
+import com.blogspot.bwgypyth.lotro.model.PacketGroup;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
 import com.google.appengine.api.users.User;
@@ -111,6 +112,12 @@ public class PacketAjaxServlet extends HttpServlet {
 				break;
 			case "delete_packet":
 				resp.getOutputStream().print(deletePacket(req));
+				break;
+			case "select_group":
+				resp.getOutputStream().print(selectGroup(req, user));
+				break;
+			case "create_group":
+				resp.getOutputStream().print(createGroup(req, user));
 				break;
 			default:
 				resp.getOutputStream().print("unknown");
@@ -494,4 +501,41 @@ public class PacketAjaxServlet extends HttpServlet {
 		analysisEntry.setEnd(end);
 		OwnedEntity.setModified(analysisEntry, user);
 	}
+
+	private static String selectGroup(HttpServletRequest req, User user) {
+		Long packetKey = Long.valueOf(req.getParameter("packet_key"));
+		Long groupKey = Long.valueOf(req.getParameter("group_key"));
+		EntityManager em = EMF.get().createEntityManager();
+		try {
+			em.getTransaction().begin();
+			Packet packet = em.find(Packet.class, packetKey);
+			PacketGroup group = em.find(PacketGroup.class, groupKey);
+			packet.setGroup(group);
+			OwnedEntity.setModified(packet, user);
+			em.persist(packet);
+			em.getTransaction().commit();
+		} finally {
+			if (em.getTransaction().isActive()) {
+				em.getTransaction().rollback();
+			}
+			em.close();
+		}
+
+		return "ok";
+	}
+
+	private static String createGroup(HttpServletRequest req, User user) {
+		EntityManager em = EMF.get().createEntityManager();
+		PacketGroup group = new PacketGroup();
+		try {
+			group.setName(req.getParameter("name"));
+			OwnedEntity.setModified(group, user);
+			em.persist(group);
+		} finally {
+			em.close();
+		}
+
+		return Long.toString(group.getKey().getId());
+	}
+
 }

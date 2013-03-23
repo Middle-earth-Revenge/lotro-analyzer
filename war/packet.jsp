@@ -1,3 +1,5 @@
+<%@page import="com.blogspot.bwgypyth.lotro.model.PacketGroup"%>
+<%@page import="com.blogspot.bwgypyth.lotro.json.PacketGroupConverter"%>
 <%@page import="com.blogspot.bwgypyth.lotro.json.IncludeKey"%>
 <%@page import="com.blogspot.bwgypyth.lotro.json.IncludeUserdata"%>
 <%@page import="com.blogspot.bwgypyth.lotro.json.PacketConverter"%>
@@ -12,12 +14,14 @@
 <%
 EntityManager em = EMF.get().createEntityManager();
 try {
-	Packet packet;
-	if (request.getParameter("packet") != null) {
-		packet = em.find(Packet.class, Long.valueOf(request.getParameter("packet")));
-	} else {
-	packet = (Packet) em.createQuery("select packet from Packet packet").setMaxResults(1).getSingleResult();
+
+	// Load our packet
+	if (request.getParameter("packet") == null) {
+		throw new ServletException("Missing parameter 'packet'");
 	}
+	Packet packet = em.find(Packet.class, Long.valueOf(request.getParameter("packet")));
+
+	// Load either the given analysis or the first one
 	Analysis analysis = new Analysis();
 	if (request.getParameter("analysis") != null) {
 		analysis = em.find(Analysis.class, Long.valueOf(request.getParameter("analysis")));
@@ -27,13 +31,14 @@ try {
 	} else if (!packet.getAnalyses().isEmpty()) {
 		analysis = packet.getAnalyses().get(0);
 	}
-	if (analysis.getKey() == null) {
-		analysis.setName("Unnamed Analysis");
-		packet.getAnalyses().add(analysis);
-		analysis.setPacket(packet);
-	}
+
+	// Load the available groups
+	List<PacketGroup> groups = em.createQuery("select group from PacketGroup group order by name").getResultList();
+
+	// Hand it over to the JSP
 	pageContext.setAttribute("packet", packet);
 	pageContext.setAttribute("analysis", analysis);
+	pageContext.setAttribute("groups", groups);
 %>
 <!DOCTYPE html>
 <html>
@@ -43,115 +48,16 @@ try {
 		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
 		<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 		<script type="text/javascript" src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
-		<style type="text/css">
-			div#packet_offset, div#packet_hex, div#packet_decoded {
-				font-family: monospace;
-				float: left;
-				line-height: 150%;
-				white-space: nowrap;
-			}
-			div#legend {
-				clear: both;
-				margin-top: 5px;
-			}
-			div#packet_decoded, div#packet_hex {
-				margin-left: 8px;
-			}
-			#legend div.hoverable {
-				margin: 0 2px;
-			}
-			span.display_header {
-				color: #5c5c5c;
-			}
-<%
-if (UserServiceFactory.getUserService().getCurrentUser() != null) {
-%>
-			span.decoded_or_hex_element_selected {
-				border: 1px dashed #333333;
-				margin: -1px;
-			}
-			span.decoded_or_hex_element {
-				cursor: pointer;
-			}
-			[contenteditable] {
-				outline: 1px dotted #CCCCCC;
-			}
-			input.duplicate {
-				border: 1px solid red;
-			}
-
-			.ui-widget {
-				font-size: 0.8em
-			}
-			div#analysis_entry td.description {
-				font-size: 0.7em;
-				vertical-align: top;
-				padding-top: 0.5em;
-			}
-			div#analysis_entry th {
-				text-align: left;
-				vertical-align: top;
-			}
-
-			/* Workaround: autocomplete is behind the dialog */
-			ul.ui-autocomplete {
-				z-index: 101;
-			}
-<%
-}
-%>
-		</style>
+		<link rel="stylesheet" href="css/packet.css" />
+<% if (UserServiceFactory.getUserService().getCurrentUser() != null) { %>
+		<link rel="stylesheet" href="css/packet.edit.css" />
+<% } %>
 		<link rel="stylesheet" href="css/file.css">
 	</head>
 	<body>
 		<%@ include file="navigation.jsp" %>
+		<script type="text/javascript" src="js/packet.js"></script>
 		<script type="text/javascript">
-			function padLeadingZeros(number, width) {
-				var tmp = '' + number;
-				while (tmp.length < width) {
-					tmp = '0' + tmp;
-				}
-				return tmp;
-			}
-
-			function generateCss(name, color, foregroundColor) {
-				return '.' + name + ' { margin-left: -1px; margin-right: -1px; border: 1px solid ' + color + '; color: ' + color + '; }\n' + 
-				'.' + name + '_hovered { background-color: ' + color + '; color: ' + foregroundColor + '; }\n';
-			}
-
-			function getForgroundColor(foregroundColor) {
-				if (foregroundColor && foregroundColor != '') {
-					return foregroundColor;
-				}
-				return '#000000';
-			}
-
-			function registerHovering(element) {
-				$(element).on('mouseover', function(event) {
-					$($(this).attr('class').split(' ')).each(function(index1, element1) {
-						if (element1.indexOf('hover') == -1) {
-							$('.' + element1).each(function (index2, element2) {
-								$(element2).addClass(element1 + '_hovered');
-							});
-						}
-					});
-					event.stopPropagation();
-				});
-				$(element).on('mouseout', function(event) {
-					$($(this).attr('class').split(' ')).each(function(index1, element1) {
-						if (element1.indexOf('hover') == -1) {
-							$('.' + element1).each(function (index2, element2) {
-								$(element2).removeClass(element1 + '_hovered');
-							});
-						}
-					});
-					event.stopPropagation();
-				});
-			}
-
-			function integerToHexString(integer) {
-				return padLeadingZeros(integer.toString(16).toUpperCase(), 4);
-			}
 
 			function renderPacket() {
 
@@ -244,8 +150,24 @@ if (user != null && userService.isUserAdmin()) {
 <%
 }
 %>
-
-				$('#name').html('<h1>' + packetName + ' - ' + analysisName + '</h1><a href="/export/packet?packet=' + packet.key + '">Export</a> <a href="/export/packet?packet=' + packet.key + '&amp;type=binary">Export binary</a>');
+				var nameString = '<h1>' + packetName + ' - ' + analysisName + '</h1>';
+<%
+if (user != null) {
+%>
+				var groupsString = '';
+				$.each(groups, function(index, element) {
+					groupsString += '<option value="' + element.key + '"';
+					if (packet.group == element.key) {
+						groupsString += ' selected="selected"';
+					}
+					groupsString += '>' + element.name + '</option>';
+				});
+				nameString += 'Group: <select name="group" id="group" onchange="selectGroup();">' + groupsString + '</select><a href="#" onclick="createGroupDialog(); return false;">Add group</a><br/>';
+<%
+}
+%>
+				nameString += '<a href="/export/packet?packet=' + packet.key + '">Export</a> <a href="/export/packet?packet=' + packet.key + '&amp;type=binary">Export binary</a>';
+				$('#name').html(nameString);
 				$('#packet_offset').html(packet_offset);
 				$('#packet_hex').html(packet_hex);
 				$('#packet_decoded').html(packet_decoded);
@@ -279,8 +201,8 @@ if (user != null) {
 						}
 
 						$(function() {
-							var analysis_entry = $('#analysis_entry');
-							analysis_entry.html(getAnalysisEntryDialogContent('', '', hex_element_start, hex_element_current, '', '', ''));
+							var analysis_entry_dialog = $('#analysis_entry_dialog');
+							analysis_entry_dialog.html(getAnalysisEntryDialogContent('', '', hex_element_start, hex_element_current, '', '', ''));
 							$('#entry_color').htmlautocomplete({
 								source: "packet_ajax?operation=autocomplete_color",
 								minLength: 1
@@ -293,7 +215,7 @@ if (user != null) {
 								source: "packet_ajax?operation=autocomplete_name",
 								minLength: 1
 							});
-							analysis_entry.dialog({
+							analysis_entry_dialog.dialog({
 								title: 'Annotate packet',
 								width: 730,
 								height: 300,
@@ -327,13 +249,13 @@ if (user != null) {
 					}
 				});
 
-				var analysis_entry = $('#analysis_entry');
-				analysis_entry.html(getAnalysisEntryDialogContent(entryToEdit.key, entryToEdit.name,  integerToHexString(entryToEdit.start), integerToHexString(entryToEdit.end), entryToEdit.description, entryToEdit.color, entryToEdit.foregroundColor));
+				var analysis_entry_dialog = $('#analysis_entry_dialog');
+				analysis_entry_dialog.html(getAnalysisEntryDialogContent(entryToEdit.key, entryToEdit.name,  integerToHexString(entryToEdit.start), integerToHexString(entryToEdit.end), entryToEdit.description, entryToEdit.color, entryToEdit.foregroundColor));
 				$('#entry_color').htmlautocomplete({
 					source: "packet_ajax?operation=autocomplete_color",
 					minLength: 1
 				});
-				analysis_entry.dialog({
+				analysis_entry_dialog.dialog({
 					title: 'Annotate packet',
 					width: 730,
 					height: 300
@@ -345,32 +267,24 @@ if (user != null) {
 					url: "packet_ajax",
 					data: { "operation": "create_analysis" }
 				}).done(function(data) {
-					if (data == 'ok') {
-						// Reload page
-						window.location.reload();
-						$('#analysis_entry').dialog('close');
-					} else if (data == 'duplicate') {
-						$('#entry_name').focus();
-						$('#entry_name').addClass('duplicate');
-					}
+					// TODO: check if is parseable as an int
 				});
 			}
 
-			function getAnalysisEntryDialogContent(key, name, start, end, description, color, foregroundcolor) {
-				var retval;
-				retval = '<table>' +
-					'<tr><th>Name*</th><td><input type="text" id="entry_name" value="' + name +'" style="width: 250px;" /><input type="hidden" id="entry_name_old" value="' + name +'" style="width: 250px;" /></td><td class="description">Unique name of this datapart within the packet (e.g. \'header0\')</td></tr>' +
-					'<tr><th>Start / End</th><td><input type="text" id="entry_start" value="0x' + start + '" style="width: 67px;" /><input type="text" id="entry_end" value="0x' + end + '" style="margin-left: 10px; width: 67px;" /> (' + (parseInt(end, 16) - parseInt(start, 16) + 1) + ' Bytes)</td><td class="description">First and last byte of datapart in packet</td></tr>' +
-					'<tr><th>Description*</th><td><textarea id="entry_description" rows="4" cols="30" style="width: 250px;">' + description +'</textarea></td><td class="description">Human readable description of this datapart</td></tr>' +
-					'<tr><th>Color*</th><td><div class="ui-widget"><input type="text" id="entry_color" value="' + color +'" style="width: 250px;" /></div></td><td class="description">Color to be used for this datapart</td></tr>' +
-					'<tr><th>Foregroundcolor</th><td><div class="ui-widget"><input type="text" id="entry_foregroundcolor" value="' + (foregroundcolor == undefined ? '' : foregroundcolor) +'" style="width: 250px;" /></div></td><td class="description">Foregroundcolor to be used for this datapart (optional)</td></tr>' +
-					'<tr><td></td><td><input type="button" onclick="submitAnalysisEntry(this);" value="save" />';
-				if (key && key != '') {
-					retval += '<input type="hidden" id="entry_key" value="' + key + '" />'
-				}
-				retval += '</td><td></td></tr>' +
-					'</table>';
-				return retval;
+			function selectGroup() {
+				$.ajax({
+					url: "packet_ajax",
+					data: {
+						"operation": "select_group",
+						"packet_key": packet.key,
+						"group_key": $('#group').val()
+					}
+				}).done(function(data) {
+					if (data == 'ok') {
+						// Reload page
+						window.location.reload();
+					}
+				});
 			}
 
 			function submitAnalysisEntry(saveButton) {
@@ -400,7 +314,7 @@ if (user != null) {
 					if (data == 'ok') {
 						// Reload page
 						window.location.reload();
-						$('#analysis_entry').dialog('close');
+						$('#analysis_entry_dialog').dialog('close');
 					} else if (data == 'duplicate') {
 						$('#entry_name').focus();
 						$('#entry_name').addClass('duplicate');
@@ -411,11 +325,12 @@ if (user != null) {
 }
 %>
 
-			var hex_element_start, packet, analysis;
+			var hex_element_start, packet, analysis, groups;
 
 			$(function() {
 				packet = <%= new PacketConverter(IncludeUserdata.INCLUDE_NONE, IncludeKey.INCLUDE_ALL).toJson(packet).toString() %>;
 				analysis = <%= new AnalysisConverter(IncludeUserdata.INCLUDE_NONE, IncludeKey.INCLUDE_ALL).toJson(analysis).toString() %>;
+				groups = <%= new PacketGroupConverter(IncludeUserdata.INCLUDE_NONE, IncludeKey.INCLUDE_ALL).toJson(groups).toString() %>;
 				renderPacket();
 
 				$('.button_left').mouseover(function() {
@@ -480,13 +395,12 @@ if (user != null) {
 %>
 			});
 		</script>
-<%
-if (user != null && userService.isUserAdmin()) {
-%>
+<% if (user != null) { %>
 		<script type="text/javascript" src="js/packet.edit.js"></script>
-<%
-}
-%>
+<% } %>
+<% if (user != null && userService.isUserAdmin()) { %>
+		<script type="text/javascript" src="js/packet.admin.js"></script>
+<% } %>
 		<div class="button_left button">
 			<div class="button_left_img"></div>
 		</div>
@@ -500,7 +414,8 @@ if (user != null && userService.isUserAdmin()) {
 			<div id="packet_decoded"></div>
 			<div id="legend"></div>
 		</div>
-		<div id="analysis_entry"></div>
+		<div id="analysis_entry_dialog"></div>
+		<div id="create_group_dialog"></div>
 	</body>
 </html>
 <%

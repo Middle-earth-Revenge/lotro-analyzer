@@ -11,6 +11,7 @@
 		<class>com.blogspot.bwgypyth.lotro.model.Entity</class>
 		<class>com.blogspot.bwgypyth.lotro.model.OwnedEntity</class>
 		<class>com.blogspot.bwgypyth.lotro.model.Packet</class>
+		<class>com.blogspot.bwgypyth.lotro.model.PacketGroup</class>
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="datanucleus.NontransactionalRead" value="true" />

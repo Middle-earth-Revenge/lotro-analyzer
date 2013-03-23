@@ -9,6 +9,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title></title>
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
 		<link rel="stylesheet" href="css/file.css">
 	</head>
 	<body>
@@ -18,7 +19,7 @@
 			<table>
 				<tr>
 					<th>Name</th>
-					<td><input type="text" name="name" /></td>
+					<td><input type="text" name="name" size="50" /></td>
 				</tr>
 				<tr>
 					<th>Data</th>
