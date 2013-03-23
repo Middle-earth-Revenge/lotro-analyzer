@@ -1,3 +1,5 @@
+<%@page import="java.util.Comparator"%>
+<%@page import="java.util.Collections"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
 <%@page import="javax.persistence.EntityManager"%>
@@ -10,6 +12,18 @@
 EntityManager em = EMF.get().createEntityManager();
 try {
 	List<Packet> packets = em.createQuery("select packet from Packet packet").getResultList();
+	Collections.sort(packets, new Comparator<Packet>() {
+		public int compare(Packet o1, Packet o2) {
+			int compareTo = o1.getGroup().getName().compareTo(o2.getGroup().getName());
+			if (compareTo == 0) {
+				compareTo = o1.getName().compareTo(o2.getName());
+				if (compareTo == 0) {
+					compareTo = o1.getKey().compareTo(o2.getKey());
+				}
+			}
+			return compareTo;
+		}
+	});
 %>
 <!DOCTYPE html>
 <html>
