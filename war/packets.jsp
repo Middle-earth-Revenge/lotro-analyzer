@@ -17,6 +17,20 @@ try {
 		<title>Available packets</title>
 		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
 		<link rel="stylesheet" href="css/file.css">
+		<style type="text/css">
+			table {
+				border-spacing: 0px;
+			}
+			td.packetgroup {
+				padding-top: 0.5em;
+				font-weight: bold;
+				padding-left: 0.5em;
+				border-bottom: 1px solid #cccccc;
+			}
+			tr.packetrow:hover td {
+				background-color: #aed0ff;
+			}
+		</style>
 	</head>
 	<body>
 		<%@ include file="navigation.jsp" %>
@@ -38,13 +52,13 @@ for (Packet packet : packets) {
 		pageContext.setAttribute("group", group);
 %>
 				<tr>
-					<td colspan="3">${group.name}</td>
+					<td colspan="3" class="packetgroup">${group.name}</td>
 				</tr>
 <%
 	}
 	pageContext.setAttribute("packet", packet);
 %>
-				<tr>
+				<tr class="packetrow">
 					<td><a href="packet.jsp?packet=${packet.key.id}">${packet.name}</a></td>
 					<td>${packet.analysesSize}</td>
 					<td><a href="/export/packet?packet=${packet.key.id}">Export</a> <a href="/export/packet?packet=${packet.key.id}&amp;type=binary">Export binary</a></td>
