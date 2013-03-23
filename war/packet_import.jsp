@@ -1,4 +1,13 @@
+<%@page import="com.blogspot.bwgypyth.lotro.model.PacketGroup"%>
+<%@page import="java.util.List"%>
+<%@page import="com.blogspot.bwgypyth.lotro.EMF"%>
+<%@page import="javax.persistence.EntityManager"%>
 <%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+EntityManager em = EMF.get().createEntityManager();
+try {
+	List<PacketGroup> groups = em.createQuery("select group from PacketGroup group").getResultList();
+%>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -13,6 +22,21 @@
 		<form action="/import/packet" method="post">
 			<table>
 				<tr>
+					<th>Group</th>
+					<td>
+						<select name="group_key">
+<%
+	for (PacketGroup group : groups) {
+		pageContext.setAttribute("group", group);
+%>
+							<option value="${group.key.id}"${group.name == 'Default' ? ' selected="selected"' : ''}>${group.name}</option>
+<%
+	}
+%>
+						</select>
+					</td>
+				</tr>
+				<tr>
 					<th>JSON-Data</th>
 					<td><textarea rows="10" cols="50" name="packet_data"></textarea></td>
 				</tr>
@@ -23,3 +47,8 @@
 		</form>
 	</body>
 </html>
+<%
+} finally {
+	em.close();
+}
+%>

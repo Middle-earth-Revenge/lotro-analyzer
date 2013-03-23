@@ -35,6 +35,7 @@ import com.blogspot.bwgypyth.lotro.json.IncludeUserdata;
 import com.blogspot.bwgypyth.lotro.json.PacketConverter;
 import com.blogspot.bwgypyth.lotro.model.OwnedEntity;
 import com.blogspot.bwgypyth.lotro.model.Packet;
+import com.blogspot.bwgypyth.lotro.model.PacketGroup;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -51,6 +52,9 @@ public class PacketImportServlet extends HttpServlet {
 		if (req.getParameter("packet_data") == null) {
 			throw new ServletException("Missing parameter 'packet_data'");
 		}
+		if (req.getParameter("group_key") == null) {
+			throw new ServletException("Missing parameter 'group_key'");
+		}
 
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
@@ -59,6 +63,7 @@ public class PacketImportServlet extends HttpServlet {
 		}
 
 		String packetData = req.getParameter("packet_data");
+		Long groupKey = Long.valueOf(req.getParameter("group_key"));
 		IncludeKey includeKey = Boolean.valueOf(req.getParameter("includeKey"))
 				.booleanValue() ? IncludeKey.INCLUDE_ALL
 				: IncludeKey.INCLUDE_NONE;
@@ -68,6 +73,9 @@ public class PacketImportServlet extends HttpServlet {
 					includeKey).fromJson(new JSONObject(packetData));
 			OwnedEntity.setCreated(packet, user);
 			OwnedEntity.setModified(packet, user);
+			PacketGroup packetGroup = em.find(PacketGroup.class, groupKey);
+			packet.setGroup(packetGroup);
+			packetGroup.getPackets().add(packet);
 
 			em.merge(packet);
 

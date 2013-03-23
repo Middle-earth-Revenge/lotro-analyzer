@@ -33,6 +33,7 @@ import com.blogspot.bwgypyth.lotro.EMF;
 import com.blogspot.bwgypyth.lotro.logic.AnalysisFactory;
 import com.blogspot.bwgypyth.lotro.model.OwnedEntity;
 import com.blogspot.bwgypyth.lotro.model.Packet;
+import com.blogspot.bwgypyth.lotro.model.PacketGroup;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -50,6 +51,15 @@ public class PacketUploadServlet extends HttpServlet {
 		if (user == null) {
 			throw new ServletException("Unauthorized access");
 		}
+		if (req.getParameter("name") == null) {
+			throw new ServletException("Missing parameter 'name'");
+		}
+		if (req.getParameter("group_key") == null) {
+			throw new ServletException("Missing parameter 'group_key'");
+		}
+		if (req.getParameter("data") == null) {
+			throw new ServletException("Missing parameter 'data'");
+		}
 		packet.setName(req.getParameter("name"));
 		packet.setData(req.getParameter("data").replace(" ", "")
 				.replace("\r", "").replace("\n", "").toUpperCase());
@@ -58,8 +68,14 @@ public class PacketUploadServlet extends HttpServlet {
 
 		AnalysisFactory.createAnalysis(packet, user);
 
+		Long groupKey = Long.valueOf(req.getParameter("group_key"));
 		EntityManager em = EMF.get().createEntityManager();
 		try {
+
+			PacketGroup packetGroup = em.find(PacketGroup.class, groupKey);
+			packet.setGroup(packetGroup);
+			packetGroup.getPackets().add(packet);
+
 			em.persist(packet);
 
 			resp.sendRedirect("packets.jsp");

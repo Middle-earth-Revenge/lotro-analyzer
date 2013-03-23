@@ -52,7 +52,7 @@ function createGroup(saveButton) {
 		if (/^\d+$/.test(data)) {
 			$('#group').append($('<option></option>').val(data).html($('#group_name').val()));
 			$('#group').val(data);
-			$('#analysis_entry_dialog').dialog('close');
+			$('#create_group_dialog').dialog('close');
 		}
 	});
 }
