@@ -281,8 +281,7 @@ if (user != null) {
 					}
 				}).done(function(data) {
 					if (data == 'ok') {
-						// Reload page
-						window.location.reload();
+						// TODO: what to do here?
 					}
 				});
 			}

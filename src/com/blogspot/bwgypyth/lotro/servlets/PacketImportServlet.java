@@ -46,17 +46,6 @@ public class PacketImportServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws IOException {
-		resp.getOutputStream().print(
-				"<!DOCTYPE html>\n" + "<html>\n" + "<body>\n"
-						+ "<form action=\"/import/packet\" method=\"post\">\n"
-						+ "<textarea name=\"packet_data\"></textarea>\n"
-						+ "<input type=\"submit\"/>\n" + "</form>\n"
-						+ "</body>\n" + "</html>");
-	}
-
-	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		if (req.getParameter("packet_data") == null) {

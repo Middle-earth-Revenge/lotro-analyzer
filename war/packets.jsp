@@ -1,14 +1,15 @@
-<%@page import="com.blogspot.bwgypyth.lotro.model.PacketGroup"%>
-<%@page import="com.google.appengine.api.users.UserService"%>
+<%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
-<%@page import="com.blogspot.bwgypyth.lotro.model.Packet"%>
-<%@page import="com.blogspot.bwgypyth.lotro.EMF"%>
 <%@page import="javax.persistence.EntityManager"%>
+<%@page import="com.google.appengine.api.users.UserService"%>
+<%@page import="com.blogspot.bwgypyth.lotro.model.Packet"%>
+<%@page import="com.blogspot.bwgypyth.lotro.model.PacketGroup"%>
+<%@page import="com.blogspot.bwgypyth.lotro.EMF"%>
 <%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
 EntityManager em = EMF.get().createEntityManager();
 try {
-	List<Packet> packets = em.createQuery("select packet from Packet packet order by packet.group, packet.name").getResultList();
+	List<Packet> packets = em.createQuery("select packet from Packet packet").getResultList();
 %>
 <!DOCTYPE html>
 <html>
@@ -72,7 +73,7 @@ if (user != null) {
 %>
 			<tfoot>
 				<tr>
-					<td colspan="3"><a href="packet_upload.jsp">Upload packet</a> <a href="/import/packet">Import packet in JSON format</a></td>
+					<td colspan="3"><a href="packet_upload.jsp">Upload packet</a> <a href="packet_import.jsp">Import packet in JSON format</a></td>
 				</tr>
 			</tfoot>
 <%

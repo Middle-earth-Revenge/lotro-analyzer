@@ -9,16 +9,12 @@
 	</head>
 	<body>
 		<%@ include file="navigation.jsp" %>
-		<h1>Upload new packet</h1>
-		<form action="packet_upload" method="post">
+		<h1>Import packet</h1>
+		<form action="/import/packet" method="post">
 			<table>
 				<tr>
-					<th>Name</th>
-					<td><input type="text" name="name" size="50" /></td>
-				</tr>
-				<tr>
-					<th>Data</th>
-					<td><textarea rows="10" cols="50" name="data"></textarea></td>
+					<th>JSON-Data</th>
+					<td><textarea rows="10" cols="50" name="packet_data"></textarea></td>
 				</tr>
 				<tr>
 					<td colspan="2" style="text-align: center;"><input type="submit" value="save" /></td>
