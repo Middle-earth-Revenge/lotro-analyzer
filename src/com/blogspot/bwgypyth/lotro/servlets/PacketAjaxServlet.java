@@ -40,6 +40,7 @@ import net.sf.jsr107cache.CacheFactory;
 import net.sf.jsr107cache.CacheManager;
 
 import com.blogspot.bwgypyth.lotro.EMF;
+import com.blogspot.bwgypyth.lotro.logic.AnalysisFactory;
 import com.blogspot.bwgypyth.lotro.model.Analysis;
 import com.blogspot.bwgypyth.lotro.model.AnalysisEntry;
 import com.blogspot.bwgypyth.lotro.model.OwnedEntity;
@@ -164,7 +165,7 @@ public class PacketAjaxServlet extends HttpServlet {
 			Packet packet = analysis.getPacket();
 			packet.getAnalyses().remove(analysis);
 			if (packet.getAnalyses().isEmpty()) {
-				Analysis stubAnalysis = Analysis.createStubAnalysis(packet,
+				Analysis stubAnalysis = AnalysisFactory.createAnalysis(packet,
 						user);
 				OwnedEntity.setModified(packet, user);
 				em.persist(stubAnalysis);
