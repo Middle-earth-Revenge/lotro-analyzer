@@ -285,6 +285,14 @@ if (user != null) {
 								source: "packet_ajax?operation=autocomplete_color",
 								minLength: 1
 							});
+							$('#entry_foregroundcolor').htmlautocomplete({
+								source: "packet_ajax?operation=autocomplete_color",
+								minLength: 1
+							});
+							$('#entry_name').htmlautocomplete({
+								source: "packet_ajax?operation=autocomplete_name",
+								minLength: 1
+							});
 							analysis_entry.dialog({
 								title: 'Annotate packet',
 								width: 730,

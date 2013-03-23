@@ -25,8 +25,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.servlet.ServletOutputStream;
@@ -57,6 +59,7 @@ public class PacketAjaxServlet extends HttpServlet {
 
 	private static Cache cache;
 	private static final String CACHE_KEY_COLORS = "colors";
+	private static final String CACHE_KEY_NAMES = "names";
 	static {
 		try {
 			CacheFactory cacheFactory = CacheManager.getInstance()
@@ -96,6 +99,9 @@ public class PacketAjaxServlet extends HttpServlet {
 				break;
 			case "autocomplete_color":
 				autocompleteColor(req, resp);
+				break;
+			case "autocomplete_name":
+				autocompleteName(req, resp);
 				break;
 			case "delete_entry":
 				resp.getOutputStream().print(deleteEntry(req));
@@ -225,16 +231,97 @@ public class PacketAjaxServlet extends HttpServlet {
 			EntityManager em = EMF.get().createEntityManager();
 			try {
 				@SuppressWarnings("unchecked")
-				List<String> colors = em.createQuery(
-						"select distinct entry.color from AnalysisEntry entry")
+				List<String> backgroundColors = em
+						.createQuery(
+								"select distinct entry.color from AnalysisEntry entry order by entry.color")
 						.getResultList();
+				Set<String> allColors = new HashSet<>(backgroundColors);
 
-				cache.put(CACHE_KEY_COLORS, new ArrayList<>(colors));
+				@SuppressWarnings("unchecked")
+				List<String> foregroundColors = em
+						.createQuery(
+								"select distinct entry.foregroundColor from AnalysisEntry entry order by entry.foregroundColor")
+						.getResultList();
+				allColors.addAll(foregroundColors);
+
+				List<String> colors = new ArrayList<>(allColors);
+				Collections.sort(colors);
+				cache.put(CACHE_KEY_COLORS, colors);
 				out.print(getMatchingColors(colors, term));
 			} finally {
 				em.close();
 			}
 		}
+	}
+
+	private static String getMatchingColors(List<String> colors, String term) {
+		StringBuilder buffer = new StringBuilder();
+		buffer.append("[");
+		for (String color : colors) {
+			if (color.startsWith(term)) {
+				if (buffer.length() > 1) {
+					buffer.append(",");
+				}
+				buffer.append("{\"id\":\"");
+				buffer.append(color);
+				buffer.append("\",\"label\":\"<span style=\\\"color: ");
+				buffer.append(color);
+				buffer.append("\\\">");
+				buffer.append(color);
+				buffer.append("</span>\",\"value\":\"");
+				buffer.append(color);
+				buffer.append("\"}");
+			}
+		}
+		buffer.append("]");
+		return buffer.toString();
+	}
+
+	private static void autocompleteName(HttpServletRequest req,
+			HttpServletResponse resp) throws IOException {
+		@SuppressWarnings("resource")
+		ServletOutputStream out = resp.getOutputStream();
+		resp.setContentType("application/json");
+		String term = req.getParameter("term");
+		if (cache.containsKey(CACHE_KEY_NAMES)) {
+			@SuppressWarnings("unchecked")
+			List<String> names = (List<String>) cache.get(CACHE_KEY_NAMES);
+			out.print(getMatchingNames(names, term));
+		} else {
+			EntityManager em = EMF.get().createEntityManager();
+			try {
+				@SuppressWarnings("unchecked")
+				List<String> names = em
+						.createQuery(
+								"select distinct entry.name from AnalysisEntry entry order by entry.name")
+						.getResultList();
+				cache.put(CACHE_KEY_NAMES, new ArrayList<>(names));
+				out.print(getMatchingNames(names, term));
+			} finally {
+				em.close();
+			}
+		}
+	}
+
+	private static String getMatchingNames(List<String> names, String term) {
+		StringBuilder buffer = new StringBuilder();
+		buffer.append("[");
+		for (String name : names) {
+			if (name.startsWith(term)) {
+				if (buffer.length() > 1) {
+					buffer.append(",");
+				}
+				buffer.append("{\"id\":\"");
+				buffer.append(name);
+				buffer.append("\",\"label\":\"");
+				buffer.append(name);
+				buffer.append("\",\"value\":\"");
+				buffer.append(name);
+				buffer.append("\"}");
+			}
+		}
+		buffer.append("]");
+		return buffer.toString();
 	}
 
 	private static String createAnalysisentry(HttpServletRequest req, User user) {
@@ -270,7 +357,7 @@ public class PacketAjaxServlet extends HttpServlet {
 
 			em.merge(analysis);
 
-			updateColorCache(analysisEntry);
+			updateCache(analysisEntry);
 		} finally {
 			em.close();
 		}
@@ -312,7 +399,7 @@ public class PacketAjaxServlet extends HttpServlet {
 
 			em.merge(analysisEntry);
 
-			updateColorCache(analysisEntry);
+			updateCache(analysisEntry);
 		} finally {
 			em.close();
 		}
@@ -365,7 +452,7 @@ public class PacketAjaxServlet extends HttpServlet {
 		return "ok";
 	}
 
-	private static void updateColorCache(AnalysisEntry analysisEntry) {
+	private static void updateCache(AnalysisEntry analysisEntry) {
 		if (cache != null) {
 			if (cache.containsKey(CACHE_KEY_COLORS)) {
 				@SuppressWarnings("unchecked")
@@ -375,31 +462,23 @@ public class PacketAjaxServlet extends HttpServlet {
 					colors.add(analysisEntry.getColor());
 					Collections.sort(colors);
 				}
-			}
-		}
-	}
-
-	private static String getMatchingColors(List<String> colors, String term) {
-		StringBuilder buffer = new StringBuilder();
-		buffer.append("[");
-		for (String color : colors) {
-			if (color.startsWith(term)) {
-				if (buffer.length() > 1) {
-					buffer.append(",");
+				if (!colors.contains(analysisEntry.getForegroundColor())) {
+					colors.add(analysisEntry.getForegroundColor());
+					Collections.sort(colors);
 				}
-				buffer.append("{\"id\":\"");
-				buffer.append(color);
-				buffer.append("\",\"label\":\"<span style=\\\"color: ");
-				buffer.append(color);
-				buffer.append("\\\">");
-				buffer.append(color);
-				buffer.append("</span>\",\"value\":\"");
-				buffer.append(color);
-				buffer.append("\"}");
+				cache.put(CACHE_KEY_COLORS, colors);
+			}
+
+			if (cache.containsKey(CACHE_KEY_NAMES)) {
+				@SuppressWarnings("unchecked")
+				List<String> names = (List<String>) cache.get(CACHE_KEY_NAMES);
+				if (!names.contains(analysisEntry.getName())) {
+					names.add(analysisEntry.getName());
+					Collections.sort(names);
+				}
+				cache.put(CACHE_KEY_NAMES, names);
 			}
 		}
-		buffer.append("]");
-		return buffer.toString();
 	}
 
 	private static void setAnalysisData(User user, int start, int end,
