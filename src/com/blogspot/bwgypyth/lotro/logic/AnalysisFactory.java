@@ -20,8 +20,9 @@ public class AnalysisFactory {
 		addCommunicationIdEntry(user, analysis);
 		addSizeEntry(user, analysis);
 		addRootCommandEntry(user, analysis);
-		addOffsetEntry(user, analysis);
+		int offset = addOffsetEntry(user, analysis);
 		addDataEntry(user, analysis);
+		addSubcommand(user, analysis, offset);
 		return analysis;
 	}
 
@@ -78,21 +79,22 @@ public class AnalysisFactory {
 		analysis.getAnalysisEntries().add(analysisEntry);
 	}
 
-	private static void addOffsetEntry(User user, Analysis analysis) {
+	private static int addOffsetEntry(User user, Analysis analysis) {
 		String byte5 = analysis.getPacket().getData().substring(8, 10);
 		switch (byte5) {
 		case "08": {
-			AnalysisEntry analysisEntry = new AnalysisEntry();
-			analysisEntry.setName("data_offset");
-			analysisEntry.setStart(0x14);
-			analysisEntry.setEnd(0x19);
-			analysisEntry.setColor("#FFFF00");
-			analysisEntry.setDescription("Padding (see 0x04)");
-			analysisEntry.setAnalysis(analysis);
-			OwnedEntity.setCreated(analysisEntry, user);
-			OwnedEntity.setModified(analysisEntry, user);
-			analysis.getAnalysisEntries().add(analysisEntry);
-		}
+			{
+				AnalysisEntry analysisEntry = new AnalysisEntry();
+				analysisEntry.setName("data_offset");
+				analysisEntry.setStart(0x14);
+				analysisEntry.setEnd(0x19);
+				analysisEntry.setColor("#FFFF00");
+				analysisEntry.setDescription("Padding (see 0x04)");
+				analysisEntry.setAnalysis(analysis);
+				OwnedEntity.setCreated(analysisEntry, user);
+				OwnedEntity.setModified(analysisEntry, user);
+				analysis.getAnalysisEntries().add(analysisEntry);
+			}
 			{
 				AnalysisEntry analysisEntry = new AnalysisEntry();
 				analysisEntry.setName("header_offset");
@@ -105,19 +107,21 @@ public class AnalysisFactory {
 				OwnedEntity.setModified(analysisEntry, user);
 				analysis.getAnalysisEntries().add(analysisEntry);
 			}
-			break;
-		case "0B": {
-			AnalysisEntry analysisEntry = new AnalysisEntry();
-			analysisEntry.setName("data_offset");
-			analysisEntry.setStart(0x14);
-			analysisEntry.setEnd(0x25);
-			analysisEntry.setColor("#FFFF00");
-			analysisEntry.setDescription("Padding (see 0x04)");
-			analysisEntry.setAnalysis(analysis);
-			OwnedEntity.setCreated(analysisEntry, user);
-			OwnedEntity.setModified(analysisEntry, user);
-			analysis.getAnalysisEntries().add(analysisEntry);
+			return 0x6;
 		}
+		case "0B": {
+			{
+				AnalysisEntry analysisEntry = new AnalysisEntry();
+				analysisEntry.setName("data_offset");
+				analysisEntry.setStart(0x14);
+				analysisEntry.setEnd(0x25);
+				analysisEntry.setColor("#FFFF00");
+				analysisEntry.setDescription("Padding (see 0x04)");
+				analysisEntry.setAnalysis(analysis);
+				OwnedEntity.setCreated(analysisEntry, user);
+				OwnedEntity.setModified(analysisEntry, user);
+				analysis.getAnalysisEntries().add(analysisEntry);
+			}
 			{
 				AnalysisEntry analysisEntry = new AnalysisEntry();
 				analysisEntry.setName("header_offset");
@@ -130,9 +134,10 @@ public class AnalysisFactory {
 				OwnedEntity.setModified(analysisEntry, user);
 				analysis.getAnalysisEntries().add(analysisEntry);
 			}
-			break;
+			return 0x12;
+		}
 		default:
-			break;
+			return 0x0;
 		}
 	}
 
@@ -143,6 +148,19 @@ public class AnalysisFactory {
 		analysisEntry.setEnd((analysis.getPacket().getData().length() / 2) - 1);
 		analysisEntry.setColor("#777777");
 		analysisEntry.setDescription("<b>Data</b>");
+		analysisEntry.setAnalysis(analysis);
+		OwnedEntity.setCreated(analysisEntry, user);
+		OwnedEntity.setModified(analysisEntry, user);
+		analysis.getAnalysisEntries().add(analysisEntry);
+	}
+
+	private static void addSubcommand(User user, Analysis analysis, int offset) {
+		AnalysisEntry analysisEntry = new AnalysisEntry();
+		analysisEntry.setName("data_subcommand");
+		analysisEntry.setStart(0x14 + offset);
+		analysisEntry.setEnd(0x14 + offset + 2);
+		analysisEntry.setColor("#ff0000");
+		analysisEntry.setDescription("Subcommand");
 		analysisEntry.setAnalysis(analysis);
 		OwnedEntity.setCreated(analysisEntry, user);
 		OwnedEntity.setModified(analysisEntry, user);
