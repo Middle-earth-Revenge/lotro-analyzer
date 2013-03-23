@@ -9,13 +9,17 @@ User user = userService.getCurrentUser();
 <nav class="navigation">
 	<a href="packets.jsp">Packets</a>
 <%
+StringBuffer currentUrl = request.getRequestURL();
+if (request.getQueryString() != null) {
+	currentUrl.append('?').append(request.getQueryString());
+}
 if (user != null) {
 %>
-	<a href="<%= userService.createLogoutURL(request.getRequestURI()) %>">Sign out <%= user.getNickname() %></a>
+	<a href="<%= userService.createLogoutURL(currentUrl.toString()) %>">Sign out <%= user.getNickname() %></a>
 <%
 } else {
 %>
-	<a href="<%=userService.createLoginURL(request.getRequestURI())%>">Sign in</a>
+	<a href="<%=userService.createLoginURL(currentUrl.toString())%>">Sign in</a>
 <%
 }
 %>
