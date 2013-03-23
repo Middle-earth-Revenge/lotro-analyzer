@@ -21,6 +21,7 @@ public class AnalysisFactory {
 		addSizeEntry(user, analysis);
 		addRootCommandEntry(user, analysis);
 		int offset = addOffsetEntry(user, analysis);
+		addPacketCount(user, analysis);
 		addDataEntry(user, analysis);
 		addSubcommand(user, analysis, offset);
 		return analysis;
@@ -139,6 +140,20 @@ public class AnalysisFactory {
 		default:
 			return 0x0;
 		}
+	}
+
+	private static void addPacketCount(User user, Analysis analysis) {
+		AnalysisEntry analysisEntry = new AnalysisEntry();
+		analysisEntry.setName("header_packetcount");
+		analysisEntry.setStart(0x08);
+		analysisEntry.setEnd(0x0b);
+		analysisEntry.setColor("#79109a");
+		analysisEntry
+				.setDescription("Number of all packets sent in this session");
+		analysisEntry.setAnalysis(analysis);
+		OwnedEntity.setCreated(analysisEntry, user);
+		OwnedEntity.setModified(analysisEntry, user);
+		analysis.getAnalysisEntries().add(analysisEntry);
 	}
 
 	private static void addDataEntry(User user, Analysis analysis) {
