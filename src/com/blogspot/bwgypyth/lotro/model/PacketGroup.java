@@ -26,7 +26,12 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
+
+import com.blogspot.bwgypyth.lotro.EMF;
+import com.google.appengine.api.datastore.Key;
 
 @Entity
 public class PacketGroup extends OwnedEntity {
@@ -34,8 +39,10 @@ public class PacketGroup extends OwnedEntity {
 	private String name;
 	private String description;
 
-	@OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
-	private List<Packet> packets = new ArrayList<>(0);
+	@OneToMany(mappedBy = "groupKey", cascade = CascadeType.ALL)
+	private List<Key> packetKeys = new ArrayList<>(0);
+	@Transient
+	private List<Packet> packets = null;
 
 	public String getName() {
 		return name;
@@ -53,12 +60,32 @@ public class PacketGroup extends OwnedEntity {
 		this.description = description;
 	}
 
+	public List<Key> getPacketKeys() {
+		return packetKeys;
+	}
+
+	public void setPacketKeys(List<Key> packetKeys) {
+		this.packets = null;
+		this.packetKeys = packetKeys;
+	}
+
+	@SuppressWarnings("unchecked")
 	public List<Packet> getPackets() {
+		if (packets == null) {
+			if (packetKeys.isEmpty()) {
+				packets = new ArrayList<>(0);
+			} else {
+				EntityManager em = EMF.get().createEntityManager();
+				try {
+					packets = em
+							.createQuery(
+									"select packet form Packet packet where packet.key in (:keys)")
+							.setParameter("keys", packetKeys).getResultList();
+				} finally {
+					em.close();
+				}
+			}
+		}
 		return packets;
 	}
-
-	public void setPackets(List<Packet> packets) {
-		this.packets = packets;
-	}
-
 }

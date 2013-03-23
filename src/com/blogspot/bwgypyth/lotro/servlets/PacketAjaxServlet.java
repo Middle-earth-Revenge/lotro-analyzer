@@ -247,7 +247,7 @@ public class PacketAjaxServlet extends HttpServlet {
 				@SuppressWarnings("unchecked")
 				List<String> foregroundColors = em
 						.createQuery(
-								"select distinct entry.foregroundColor from AnalysisEntry entry order by entry.foregroundColor")
+								"select distinct entry.foregroundColor from AnalysisEntry entry where entry.foregroundColor is not null order by entry.foregroundColor")
 						.getResultList();
 				allColors.addAll(foregroundColors);
 
@@ -510,7 +510,7 @@ public class PacketAjaxServlet extends HttpServlet {
 			em.getTransaction().begin();
 			Packet packet = em.find(Packet.class, packetKey);
 			PacketGroup group = em.find(PacketGroup.class, groupKey);
-			packet.setGroup(group);
+			packet.setGroupKey(group.getKey());
 			OwnedEntity.setModified(packet, user);
 			em.persist(packet);
 			em.getTransaction().commit();
@@ -529,6 +529,7 @@ public class PacketAjaxServlet extends HttpServlet {
 		PacketGroup group = new PacketGroup();
 		try {
 			group.setName(req.getParameter("name"));
+			OwnedEntity.setCreated(group, user);
 			OwnedEntity.setModified(group, user);
 			em.persist(group);
 		} finally {

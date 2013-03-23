@@ -49,7 +49,7 @@ public class PacketConverter extends AbstractConverter<Packet> {
 			PacketGroup group = new PacketGroup();
 			group.setKey(KeyFactory.createKey("PacketGroup",
 					jsonObject.getLong("group")));
-			entity.setGroup(group);
+			entity.setGroupKey(group.getKey());
 		}
 		userdataFromJson(jsonObject, entity);
 		JSONArray jsonArray = jsonObject.getJSONArray("analyses");

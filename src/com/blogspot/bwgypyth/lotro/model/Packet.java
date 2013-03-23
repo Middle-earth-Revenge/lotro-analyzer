@@ -27,10 +27,15 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
+import com.blogspot.bwgypyth.lotro.EMF;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
 import com.google.appengine.datanucleus.annotations.Unowned;
 
@@ -40,8 +45,11 @@ public class Packet extends OwnedEntity {
 	@Column(name = "data")
 	private Text dataText;
 	private String name;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@Unowned
+	@JoinColumn(name = "group_key")
+	private Key groupKey;
+	@Transient
 	private PacketGroup group;
 	@OneToMany(mappedBy = "packet", cascade = CascadeType.ALL)
 	private List<Analysis> analyses = new ArrayList<>(0);
@@ -75,12 +83,29 @@ public class Packet extends OwnedEntity {
 		this.name = name;
 	}
 
-	public PacketGroup getGroup() {
-		return group;
+	public Key getGroupKey() {
+		return groupKey;
 	}
 
-	public void setGroup(PacketGroup group) {
-		this.group = group;
+	public void setGroupKey(Key groupKey) {
+		this.groupKey = groupKey;
+	}
+
+	public PacketGroup getGroup() {
+		if (group == null) {
+			if (groupKey != null) {
+				EntityManager em = EMF.get().createEntityManager();
+				try {
+					group = (PacketGroup) em
+							.createQuery(
+									"select group from PacketGroup group where group.key = :key")
+							.setParameter("key", groupKey).getSingleResult();
+				} finally {
+					em.close();
+				}
+			}
+		}
+		return group;
 	}
 
 	public List<Analysis> getAnalyses() {

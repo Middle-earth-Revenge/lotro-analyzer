@@ -28,7 +28,7 @@ public class PacketGroupConverter extends AbstractConverter<PacketGroup> {
 		for (int i = 0; i < jsonArray.length(); i++) {
 			Packet packet = packetConverter
 					.fromJson(jsonArray.getJSONObject(i));
-			packet.setGroup(entity);
+			packet.setGroupKey(entity.getKey());
 			entity.getPackets().add(packet);
 		}
 

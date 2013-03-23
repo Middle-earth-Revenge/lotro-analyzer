@@ -74,7 +74,7 @@ public class PacketImportServlet extends HttpServlet {
 			OwnedEntity.setCreated(packet, user);
 			OwnedEntity.setModified(packet, user);
 			PacketGroup packetGroup = em.find(PacketGroup.class, groupKey);
-			packet.setGroup(packetGroup);
+			packet.setGroupKey(packetGroup.getKey());
 			packetGroup.getPackets().add(packet);
 
 			em.merge(packet);

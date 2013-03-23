@@ -396,6 +396,7 @@ if (user != null) {
 		</script>
 <% if (user != null) { %>
 		<script type="text/javascript" src="js/packet.edit.js"></script>
+		<script type="text/javascript" src="js/group.edit.js"></script>
 <% } %>
 <% if (user != null && userService.isUserAdmin()) { %>
 		<script type="text/javascript" src="js/packet.admin.js"></script>

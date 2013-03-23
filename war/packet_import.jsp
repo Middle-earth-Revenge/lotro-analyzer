@@ -14,6 +14,8 @@ try {
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title></title>
 		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 		<link rel="stylesheet" href="css/file.css">
 	</head>
 	<body>
@@ -24,7 +26,7 @@ try {
 				<tr>
 					<th>Group</th>
 					<td>
-						<select name="group_key">
+						<select name="group_key" id="group">
 <%
 	for (PacketGroup group : groups) {
 		pageContext.setAttribute("group", group);
@@ -34,6 +36,7 @@ try {
 	}
 %>
 						</select>
+						<a onclick="createGroupDialog(); return false;" href="#">Add group</a>
 					</td>
 				</tr>
 				<tr>
@@ -45,6 +48,10 @@ try {
 				</tr>
 			</table>
 		</form>
+<% if (user != null) { %>
+		<script type="text/javascript" src="js/group.edit.js"></script>
+<% } %>
+		<div id="create_group_dialog"></div>
 	</body>
 </html>
 <%
