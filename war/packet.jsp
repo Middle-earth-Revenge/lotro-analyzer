@@ -1,6 +1,5 @@
 <%@page import="com.blogspot.bwgypyth.lotro.model.PacketGroup"%>
 <%@page import="com.blogspot.bwgypyth.lotro.json.PacketGroupConverter"%>
-<%@page import="com.blogspot.bwgypyth.lotro.json.IncludeUserdata"%>
 <%@page import="com.blogspot.bwgypyth.lotro.json.PacketConverter"%>
 <%@page import="java.util.List"%>
 <%@page import="javax.persistence.EntityManager"%>
@@ -330,9 +329,9 @@ if (user != null) {
 			var hex_element_start, packet, analysis, groups;
 
 			$(function() {
-				packet = <%= new PacketConverter(IncludeUserdata.INCLUDE_NONE).toJson(packet).toString() %>;
-				analysis = <%= new AnalysisConverter(IncludeUserdata.INCLUDE_NONE).toJson(analysis).toString() %>;
-				groups = <%= new PacketGroupConverter(IncludeUserdata.INCLUDE_NONE).toJson(groups).toString() %>;
+				packet = <%= new PacketConverter().toJson(packet).toString() %>;
+				analysis = <%= new AnalysisConverter().toJson(analysis).toString() %>;
+				groups = <%= new PacketGroupConverter().toJson(groups).toString() %>;
 				renderPacket();
 <%
 if (user != null) {

@@ -29,6 +29,7 @@ import javax.xml.bind.DatatypeConverter;
 
 import com.blogspot.bwgypyth.lotro.model.OwnedEntity;
 import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
@@ -46,7 +47,8 @@ public abstract class AbstractConverter<T extends OwnedEntity> {
 	private final boolean isAdmin;
 
 	public AbstractConverter() {
-		isAdmin = UserServiceFactory.getUserService().isUserAdmin();
+		UserService userService = UserServiceFactory.getUserService();
+		isAdmin = userService.isUserLoggedIn() && userService.isUserAdmin();
 	}
 
 	/**
