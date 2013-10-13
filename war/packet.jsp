@@ -162,11 +162,11 @@ if (user != null) {
 					}
 					groupsString += '>' + element.name + '</option>';
 				});
-				nameString += 'Group: <select name="group" id="group" onchange="selectGroup();">' + groupsString + '</select><a href="#" onclick="createGroupDialog(); return false;">Add group</a><br/>';
+				nameString += 'Group: <select name="group" id="group" onchange="selectGroup();">' + groupsString + '</select><a href="#" onclick="createGroupDialog(); return false;" class="button">Add group</a><br/>';
 <%
 }
 %>
-				nameString += '<a href="/export/packet?packet=' + packet.key + '">Export</a> <a href="/export/packet?packet=' + packet.key + '&amp;type=binary">Export binary</a>';
+				nameString += '<a href="/export/packet?packet=' + packet.key + '"class="button">Export</a> <a href="/export/packet?packet=' + packet.key + '&amp;type=binary"class="button">Export binary</a>';
 				$('#name').html(nameString);
 				$('#packet_offset').html(packet_offset);
 				$('#packet_hex').html(packet_hex);
