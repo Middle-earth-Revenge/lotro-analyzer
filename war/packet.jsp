@@ -205,6 +205,7 @@ if (user != null) {
 						$(function() {
 							var analysis_entry_dialog = $('#analysis_entry_dialog');
 							analysis_entry_dialog.html(getAnalysisEntryDialogContent('', '', hex_element_start, hex_element_current, '', '', ''));
+							$('a.button, input[type=submit], input[type=button]').button();
 							$('#entry_color').htmlautocomplete({
 								source: "packet_ajax?operation=autocomplete_color",
 								minLength: 1
@@ -253,6 +254,7 @@ if (user != null) {
 
 				var analysis_entry_dialog = $('#analysis_entry_dialog');
 				analysis_entry_dialog.html(getAnalysisEntryDialogContent(entryToEdit.key, entryToEdit.name,  integerToHexString(entryToEdit.start), integerToHexString(entryToEdit.end), entryToEdit.description, entryToEdit.color, entryToEdit.foregroundColor));
+				$('a.button, input[type=submit], input[type=button]').button();
 				$('#entry_color').htmlautocomplete({
 					source: "packet_ajax?operation=autocomplete_color",
 					minLength: 1
