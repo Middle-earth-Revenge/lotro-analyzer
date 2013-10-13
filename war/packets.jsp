@@ -1,3 +1,4 @@
+<%@page import="com.google.appengine.api.datastore.KeyFactory"%>
 <%@page import="java.util.Comparator"%>
 <%@page import="java.util.Collections"%>
 <%@page import="java.util.ArrayList"%>
@@ -11,7 +12,12 @@
 <%
 EntityManager em = EMF.get().createEntityManager();
 try {
-	List<Packet> packets = em.createQuery("select packet from Packet packet").getResultList();
+	List<Packet> packets;
+	if (request.getParameter("group") == null || request.getParameter("group").isEmpty()) {
+		packets = em.createQuery("select packet from Packet packet").getResultList();
+	} else {
+		packets = em.createQuery("select packet from Packet packet where groupKey = :groupKey").setParameter("groupKey", KeyFactory.createKey("PacketGroup", Long.parseLong(request.getParameter("group")))).getResultList();
+	}
 	Collections.sort(packets, new Comparator<Packet>() {
 		public int compare(Packet o1, Packet o2) {
 			int compareTo = o1.getGroup().getName().compareTo(o2.getGroup().getName());
