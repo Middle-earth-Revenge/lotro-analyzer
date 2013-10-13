@@ -331,19 +331,6 @@ if (user != null) {
 				analysis = <%= new AnalysisConverter(IncludeUserdata.INCLUDE_NONE, IncludeKey.INCLUDE_ALL).toJson(analysis).toString() %>;
 				groups = <%= new PacketGroupConverter(IncludeUserdata.INCLUDE_NONE, IncludeKey.INCLUDE_ALL).toJson(groups).toString() %>;
 				renderPacket();
-
-				$('.button_left').mouseover(function() {
-					$('.button_left_img').addClass('button_left_img_hover');
-				});
-				$('.button_left').mouseout(function() {
-					$('.button_left_img').removeClass('button_left_img_hover');
-				});
-				$('.button_right').mouseover(function() {
-					$('.button_right_img').addClass('button_right_img_hover');
-				});
-				$('.button_right').mouseout(function() {
-					$('.button_right_img').removeClass('button_right_img_hover');
-				});
 <%
 if (user != null) {
 %>
@@ -401,12 +388,6 @@ if (user != null) {
 <% if (user != null && userService.isUserAdmin()) { %>
 		<script type="text/javascript" src="js/packet.admin.js"></script>
 <% } %>
-		<div class="button_left button">
-			<div class="button_left_img"></div>
-		</div>
-		<div class="button_right button">
-			<div class="button_right_img"></div>
-		</div>
 		<div class="content">
 			<div id="name"></div>
 			<div id="packet_offset"></div>
