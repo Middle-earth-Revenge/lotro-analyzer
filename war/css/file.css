@@ -9,3 +9,8 @@ body {
 .ui-widget {
 	font-size: 0.8em
 }
+
+#toolbar {
+	padding: 4px;
+	display: inline-block;
+}
