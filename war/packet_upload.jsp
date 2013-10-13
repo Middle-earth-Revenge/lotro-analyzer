@@ -40,7 +40,7 @@ try {
 	}
 %>
 						</select>
-						<a onclick="createGroupDialog(); return false;" href="#">Add group</a>
+						<a onclick="createGroupDialog(); return false;" href="#" class="button">Add group</a>
 					</td>
 				</tr>
 				<tr>
@@ -56,6 +56,7 @@ try {
 		<script type="text/javascript" src="js/group.edit.js"></script>
 <% } %>
 		<div id="create_group_dialog"></div>
+		<script type="text/javascript">$(function() { $('a.button, input[type=submit], input[type=button]').button(); });</script>
 	</body>
 </html>
 <%

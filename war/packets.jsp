@@ -31,6 +31,8 @@ try {
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>Available packets</title>
 		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 		<link rel="stylesheet" href="css/file.css">
 		<style type="text/css">
 			table {
@@ -67,7 +69,7 @@ for (Packet packet : packets) {
 		pageContext.setAttribute("group", group);
 %>
 				<tr>
-					<td colspan="3" class="packetgroup">${group.name}</td>
+					<td colspan="3" class="packetgroup"><a href="packets.jsp?group=${group.key.id}">${group.name}</a></td>
 				</tr>
 <%
 	}
@@ -87,13 +89,14 @@ if (user != null) {
 %>
 			<tfoot>
 				<tr>
-					<td colspan="3"><a href="packet_upload.jsp">Upload packet</a> <a href="packet_import.jsp">Import packet in JSON format</a></td>
+					<td colspan="3"><a href="packet_upload.jsp" class="button">Upload packet</a> <a href="packet_import.jsp" class="button">Import packet in JSON format</a></td>
 				</tr>
 			</tfoot>
 <%
 }
 %>
 		</table>
+		<script type="text/javascript">$(function() { $('a.button, input[type=submit], input[type=button]').button(); });</script>
 	</body>
 </html>
 <%

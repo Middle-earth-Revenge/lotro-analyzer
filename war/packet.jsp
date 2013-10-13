@@ -397,6 +397,7 @@ if (user != null) {
 		</div>
 		<div id="analysis_entry_dialog"></div>
 		<div id="create_group_dialog"></div>
+		<script type="text/javascript">$(function() { $('a.button, input[type=submit], input[type=button]').button(); });</script>
 	</body>
 </html>
 <%

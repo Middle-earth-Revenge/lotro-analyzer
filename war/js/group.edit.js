@@ -1,6 +1,7 @@
 function createGroupDialog() {
 	var create_group_dialog = $('#create_group_dialog');
 	create_group_dialog.html(getCreateGroupDialog());
+	$('a.button, input[type=submit], input[type=button]').button();
 	create_group_dialog.dialog({
 		title: 'Create group',
 		width: 730,
