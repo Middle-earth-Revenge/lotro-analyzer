@@ -1,5 +1,6 @@
 package com.blogspot.bwgypyth.lotro.json;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -111,7 +112,7 @@ public class AnalysisConverterTest {
 				+ "		description: 'Unicode Account name with leading length', \n"
 				+ "		color: '#ff66cc'\n" + "	}\n" + "]";
 		Analysis analysis = converter.fromJson(new JSONObject(json));
-		// System.out.println(analysis);
+		Assert.assertNotNull(analysis);
 	}
 
 	@Test
@@ -209,6 +210,6 @@ public class AnalysisConverterTest {
 				+ "		description: 'Unicode Account name with leading length', \n"
 				+ "		color: '#ff66cc'\n" + "	}\n" + "]";
 		Analysis analysis = converter.fromJson(new JSONObject(json));
-		System.out.println(converter.toJson(analysis));
+		Assert.assertNotNull(converter.toJson(analysis));
 	}
 }
