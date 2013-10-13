@@ -29,10 +29,6 @@ import com.google.common.base.Strings;
 
 public class AnalysisEntryConverter extends AbstractConverter<AnalysisEntry> {
 
-	public AnalysisEntryConverter(IncludeUserdata includeUserdata) {
-		super(includeUserdata);
-	}
-
 	@Override
 	public AnalysisEntry fromJson(JSONObject jsonObject) throws JSONException {
 

@@ -30,14 +30,9 @@ import com.google.appengine.labs.repackaged.org.json.JSONObject;
 
 public class AnalysisConverter extends AbstractConverter<Analysis> {
 
-	public AnalysisConverter(IncludeUserdata includeUserdata) {
-		super(includeUserdata);
-	}
-
 	@Override
 	public Analysis fromJson(JSONObject jsonObject) throws JSONException {
-		AnalysisEntryConverter analysisEntryConverter = new AnalysisEntryConverter(
-				includeUserdata);
+		AnalysisEntryConverter analysisEntryConverter = new AnalysisEntryConverter();
 
 		Analysis entity = new Analysis();
 		keyFromJson(jsonObject, entity);
@@ -56,8 +51,7 @@ public class AnalysisConverter extends AbstractConverter<Analysis> {
 
 	@Override
 	public JSONObject toJson(Analysis entity) throws JSONException {
-		AnalysisEntryConverter analysisEntryConverter = new AnalysisEntryConverter(
-				includeUserdata);
+		AnalysisEntryConverter analysisEntryConverter = new AnalysisEntryConverter();
 
 		JSONObject jsonObject = new JSONObject();
 		keyToJson(jsonObject, entity);

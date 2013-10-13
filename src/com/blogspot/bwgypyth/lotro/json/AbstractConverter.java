@@ -29,6 +29,7 @@ import javax.xml.bind.DatatypeConverter;
 
 import com.blogspot.bwgypyth.lotro.model.OwnedEntity;
 import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
@@ -42,10 +43,10 @@ import com.google.appengine.labs.repackaged.org.json.JSONObject;
  */
 public abstract class AbstractConverter<T extends OwnedEntity> {
 
-	protected final IncludeUserdata includeUserdata;
+	private final boolean isAdmin;
 
-	public AbstractConverter(IncludeUserdata includeUserdata) {
-		this.includeUserdata = includeUserdata;
+	public AbstractConverter() {
+		isAdmin = UserServiceFactory.getUserService().isUserAdmin();
 	}
 
 	/**
@@ -97,36 +98,27 @@ public abstract class AbstractConverter<T extends OwnedEntity> {
 	 * @throws JSONException
 	 *             thrown when the conversion failed
 	 */
-	protected final void userdataFromJson(JSONObject jsonObject,
+	protected static final void userdataFromJson(JSONObject jsonObject,
 			OwnedEntity entity) throws JSONException {
-		switch (includeUserdata) {
-		case INCLUDE_ALL:
-			if (jsonObject.has("created")) {
-				entity.setCreated(DatatypeConverter.parseDate(
-						jsonObject.getString("created")).getTime());
-			}
-			if (jsonObject.has("createdBy")) {
-				String[] createdBy = jsonObject.getString("createdBy").split(
-						"|");
-				String email = createdBy[0];
-				String authDomain = createdBy[1];
-				entity.setCreatedBy(new User(email, authDomain));
-			}
-			if (jsonObject.has("modified")) {
-				entity.setModified(DatatypeConverter.parseDate(
-						jsonObject.getString("modified")).getTime());
-			}
-			if (jsonObject.has("modifiedBy")) {
-				String[] modifiedBy = jsonObject.getString("modifiedBy").split(
-						"|");
-				String email = modifiedBy[0];
-				String authDomain = modifiedBy[1];
-				entity.setModifiedBy(new User(email, authDomain));
-			}
-			break;
-		default:
-		case INCLUDE_NONE:
-			break;
+		if (jsonObject.has("created")) {
+			entity.setCreated(DatatypeConverter.parseDate(
+					jsonObject.getString("created")).getTime());
+		}
+		if (jsonObject.has("createdBy")) {
+			String[] createdBy = jsonObject.getString("createdBy").split("|");
+			String email = createdBy[0];
+			String authDomain = createdBy[1];
+			entity.setCreatedBy(new User(email, authDomain));
+		}
+		if (jsonObject.has("modified")) {
+			entity.setModified(DatatypeConverter.parseDate(
+					jsonObject.getString("modified")).getTime());
+		}
+		if (jsonObject.has("modifiedBy")) {
+			String[] modifiedBy = jsonObject.getString("modifiedBy").split("|");
+			String email = modifiedBy[0];
+			String authDomain = modifiedBy[1];
+			entity.setModifiedBy(new User(email, authDomain));
 		}
 	}
 
@@ -146,8 +138,7 @@ public abstract class AbstractConverter<T extends OwnedEntity> {
 	 */
 	protected final void userdataToJson(JSONObject jsonObject,
 			OwnedEntity entity) throws JSONException {
-		switch (includeUserdata) {
-		case INCLUDE_ALL:
+		if (isAdmin) {
 			if (entity.getCreated() != null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(entity.getCreated());
@@ -166,10 +157,6 @@ public abstract class AbstractConverter<T extends OwnedEntity> {
 				jsonObject.put("modifiedBy", entity.getModifiedBy().getEmail()
 						+ "|" + entity.getModifiedBy().getAuthDomain());
 			}
-			break;
-		default:
-		case INCLUDE_NONE:
-			break;
 		}
 	}
 

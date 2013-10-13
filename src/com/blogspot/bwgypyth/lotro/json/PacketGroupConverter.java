@@ -9,13 +9,9 @@ import com.google.appengine.labs.repackaged.org.json.JSONObject;
 
 public class PacketGroupConverter extends AbstractConverter<PacketGroup> {
 
-	public PacketGroupConverter(IncludeUserdata includeUserdata) {
-		super(includeUserdata);
-	}
-
 	@Override
 	public PacketGroup fromJson(JSONObject jsonObject) throws JSONException {
-		PacketConverter packetConverter = new PacketConverter(includeUserdata);
+		PacketConverter packetConverter = new PacketConverter();
 
 		PacketGroup entity = new PacketGroup();
 		keyFromJson(jsonObject, entity);
@@ -34,7 +30,7 @@ public class PacketGroupConverter extends AbstractConverter<PacketGroup> {
 
 	@Override
 	public JSONObject toJson(PacketGroup entity) throws JSONException {
-		PacketConverter packetConverter = new PacketConverter(includeUserdata);
+		PacketConverter packetConverter = new PacketConverter();
 
 		JSONObject jsonObject = new JSONObject();
 		keyToJson(jsonObject, entity);

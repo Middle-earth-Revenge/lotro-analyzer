@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.blogspot.bwgypyth.lotro.EMF;
-import com.blogspot.bwgypyth.lotro.json.IncludeUserdata;
 import com.blogspot.bwgypyth.lotro.json.PacketConverter;
 import com.blogspot.bwgypyth.lotro.model.OwnedEntity;
 import com.blogspot.bwgypyth.lotro.model.Packet;
@@ -65,8 +64,8 @@ public class PacketImportServlet extends HttpServlet {
 		Long groupKey = Long.valueOf(req.getParameter("group_key"));
 		EntityManager em = EMF.get().createEntityManager();
 		try {
-			Packet packet = new PacketConverter(IncludeUserdata.INCLUDE_ALL)
-					.fromJson(new JSONObject(packetData));
+			Packet packet = new PacketConverter().fromJson(new JSONObject(
+					packetData));
 			OwnedEntity.setCreated(packet, user);
 			OwnedEntity.setModified(packet, user);
 			PacketGroup packetGroup = em.find(PacketGroup.class, groupKey);

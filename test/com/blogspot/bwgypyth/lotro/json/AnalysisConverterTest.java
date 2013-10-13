@@ -13,7 +13,7 @@ public class AnalysisConverterTest {
 
 	@Before
 	public void before() {
-		converter = new AnalysisConverter(IncludeUserdata.INCLUDE_NONE);
+		converter = new AnalysisConverter();
 	}
 
 	@Test

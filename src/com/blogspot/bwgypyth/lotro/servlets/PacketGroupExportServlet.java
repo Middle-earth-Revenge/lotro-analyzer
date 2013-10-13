@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.blogspot.bwgypyth.lotro.EMF;
-import com.blogspot.bwgypyth.lotro.json.IncludeUserdata;
 import com.blogspot.bwgypyth.lotro.json.PacketGroupConverter;
 import com.blogspot.bwgypyth.lotro.model.PacketGroup;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
@@ -30,8 +29,7 @@ public class PacketGroupExportServlet extends HttpServlet {
 			PacketGroup group = em.find(PacketGroup.class, groupKey);
 			resp.setContentType("application/json");
 			resp.getOutputStream().print(
-					new PacketGroupConverter(IncludeUserdata.INCLUDE_ALL)
-							.toJson(group).toString());
+					new PacketGroupConverter().toJson(group).toString());
 		} catch (JSONException e) {
 			throw new ServletException(e.getMessage(), e);
 		} finally {

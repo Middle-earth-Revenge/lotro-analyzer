@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.blogspot.bwgypyth.lotro.EMF;
 import com.blogspot.bwgypyth.lotro.json.ExportType;
-import com.blogspot.bwgypyth.lotro.json.IncludeUserdata;
 import com.blogspot.bwgypyth.lotro.json.PacketConverter;
 import com.blogspot.bwgypyth.lotro.model.Packet;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
@@ -56,8 +55,7 @@ public class PacketExportServlet extends HttpServlet {
 			case JSON:
 				resp.setContentType("application/json");
 				resp.getOutputStream().print(
-						new PacketConverter(IncludeUserdata.INCLUDE_ALL)
-								.toJson(packet).toString());
+						new PacketConverter().toJson(packet).toString());
 				break;
 			case BINARY:
 				resp.setContentType("application/octet-stream");

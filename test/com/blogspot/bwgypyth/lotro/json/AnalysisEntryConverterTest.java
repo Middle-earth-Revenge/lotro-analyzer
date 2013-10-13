@@ -14,7 +14,7 @@ public class AnalysisEntryConverterTest {
 
 	@Before
 	public void before() {
-		converter = new AnalysisEntryConverter(IncludeUserdata.INCLUDE_NONE);
+		converter = new AnalysisEntryConverter();
 	}
 
 	@Test
