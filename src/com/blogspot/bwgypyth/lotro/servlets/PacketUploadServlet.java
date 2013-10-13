@@ -74,11 +74,11 @@ public class PacketUploadServlet extends HttpServlet {
 
 			PacketGroup packetGroup = em.find(PacketGroup.class, groupKey);
 			packet.setGroupKey(packetGroup.getKey());
-			packetGroup.getPackets().add(packet);
 
 			em.persist(packet);
 
-			resp.sendRedirect("packets.jsp");
+			resp.sendRedirect("packets.jsp?group="
+					+ packetGroup.getKey().getId());
 		} finally {
 			em.close();
 		}

@@ -31,15 +31,14 @@ import com.google.appengine.labs.repackaged.org.json.JSONObject;
 
 public class PacketConverter extends AbstractConverter<Packet> {
 
-	public PacketConverter(IncludeUserdata includeUserdata,
-			IncludeKey includeKey) {
-		super(includeUserdata, includeKey);
+	public PacketConverter(IncludeUserdata includeUserdata) {
+		super(includeUserdata);
 	}
 
 	@Override
 	public Packet fromJson(JSONObject jsonObject) throws JSONException {
 		AnalysisConverter analysisConverter = new AnalysisConverter(
-				includeUserdata, includeKey);
+				includeUserdata);
 
 		Packet entity = new Packet();
 		keyFromJson(jsonObject, entity);
@@ -66,7 +65,7 @@ public class PacketConverter extends AbstractConverter<Packet> {
 	@Override
 	public JSONObject toJson(Packet entity) throws JSONException {
 		AnalysisConverter analysisConverter = new AnalysisConverter(
-				includeUserdata, includeKey);
+				includeUserdata);
 
 		JSONObject jsonObject = new JSONObject();
 		keyToJson(jsonObject, entity);
@@ -87,16 +86,9 @@ public class PacketConverter extends AbstractConverter<Packet> {
 
 	protected void keyFromJson(JSONObject jsonObject, Packet entity)
 			throws JSONException {
-		switch (includeKey) {
-		case INCLUDE_ALL:
-			if (jsonObject.has("key")) {
-				entity.setKey(KeyFactory.createKey(
-						Packet.class.getSimpleName(), jsonObject.getLong("key")));
-			}
-			break;
-		default:
-		case INCLUDE_NONE:
-			break;
+		if (jsonObject.has("key")) {
+			entity.setKey(KeyFactory.createKey(Packet.class.getSimpleName(),
+					jsonObject.getLong("key")));
 		}
 	}
 

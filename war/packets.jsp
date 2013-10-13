@@ -75,7 +75,7 @@ for (Packet packet : packets) {
 		pageContext.setAttribute("group", group);
 %>
 				<tr>
-					<td colspan="3" class="packetgroup"><a href="packets.jsp?group=${group.key.id}">${group.name}</a></td>
+					<td colspan="3" class="packetgroup"><a href="packets.jsp?group=${group.key.id}">${group.name}</a> <a style="font-weight: normal;" href="/export/packetgroup?group=${group.key.id}">Export</a></td>
 				</tr>
 <%
 	}

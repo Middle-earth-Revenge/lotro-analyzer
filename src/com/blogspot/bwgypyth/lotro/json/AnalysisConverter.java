@@ -30,15 +30,14 @@ import com.google.appengine.labs.repackaged.org.json.JSONObject;
 
 public class AnalysisConverter extends AbstractConverter<Analysis> {
 
-	public AnalysisConverter(IncludeUserdata includeUserdata,
-			IncludeKey includeKey) {
-		super(includeUserdata, includeKey);
+	public AnalysisConverter(IncludeUserdata includeUserdata) {
+		super(includeUserdata);
 	}
 
 	@Override
 	public Analysis fromJson(JSONObject jsonObject) throws JSONException {
 		AnalysisEntryConverter analysisEntryConverter = new AnalysisEntryConverter(
-				includeUserdata, includeKey);
+				includeUserdata);
 
 		Analysis entity = new Analysis();
 		keyFromJson(jsonObject, entity);
@@ -58,7 +57,7 @@ public class AnalysisConverter extends AbstractConverter<Analysis> {
 	@Override
 	public JSONObject toJson(Analysis entity) throws JSONException {
 		AnalysisEntryConverter analysisEntryConverter = new AnalysisEntryConverter(
-				includeUserdata, includeKey);
+				includeUserdata);
 
 		JSONObject jsonObject = new JSONObject();
 		keyToJson(jsonObject, entity);
@@ -75,18 +74,11 @@ public class AnalysisConverter extends AbstractConverter<Analysis> {
 
 	protected void keyFromJson(JSONObject jsonObject, Analysis entity)
 			throws JSONException {
-		switch (includeKey) {
-		case INCLUDE_ALL:
-			if (jsonObject.has("key")) {
-				entity.setKey(KeyFactory.createKey(
-						KeyFactory.createKey("Packet",
-								jsonObject.getLong("parent_key")), "Analysis",
-						jsonObject.getLong("key")));
-			}
-			break;
-		default:
-		case INCLUDE_NONE:
-			break;
+		if (jsonObject.has("key")) {
+			entity.setKey(KeyFactory.createKey(
+					KeyFactory.createKey("Packet",
+							jsonObject.getLong("parent_key")), "Analysis",
+					jsonObject.getLong("key")));
 		}
 	}
 

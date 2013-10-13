@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.blogspot.bwgypyth.lotro.EMF;
 import com.blogspot.bwgypyth.lotro.json.ExportType;
-import com.blogspot.bwgypyth.lotro.json.IncludeKey;
 import com.blogspot.bwgypyth.lotro.json.IncludeUserdata;
 import com.blogspot.bwgypyth.lotro.json.PacketConverter;
 import com.blogspot.bwgypyth.lotro.model.Packet;
@@ -48,9 +47,6 @@ public class PacketExportServlet extends HttpServlet {
 			throw new ServletException("Missing parameter 'packet'");
 		}
 		Long packetKey = Long.valueOf(req.getParameter("packet"));
-		IncludeKey includeKey = Boolean.valueOf(req.getParameter("includeKey"))
-				.booleanValue() ? IncludeKey.INCLUDE_ALL
-				: IncludeKey.INCLUDE_NONE;
 		ExportType exportType = "binary".equals(req.getParameter("type")) ? ExportType.BINARY
 				: ExportType.JSON;
 		EntityManager em = EMF.get().createEntityManager();
@@ -60,8 +56,8 @@ public class PacketExportServlet extends HttpServlet {
 			case JSON:
 				resp.setContentType("application/json");
 				resp.getOutputStream().print(
-						new PacketConverter(IncludeUserdata.INCLUDE_ALL,
-								includeKey).toJson(packet).toString());
+						new PacketConverter(IncludeUserdata.INCLUDE_ALL)
+								.toJson(packet).toString());
 				break;
 			case BINARY:
 				resp.setContentType("application/octet-stream");

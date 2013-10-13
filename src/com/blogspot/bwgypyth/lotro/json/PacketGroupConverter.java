@@ -9,15 +9,13 @@ import com.google.appengine.labs.repackaged.org.json.JSONObject;
 
 public class PacketGroupConverter extends AbstractConverter<PacketGroup> {
 
-	public PacketGroupConverter(IncludeUserdata includeUserdata,
-			IncludeKey includeKey) {
-		super(includeUserdata, includeKey);
+	public PacketGroupConverter(IncludeUserdata includeUserdata) {
+		super(includeUserdata);
 	}
 
 	@Override
 	public PacketGroup fromJson(JSONObject jsonObject) throws JSONException {
-		PacketConverter packetConverter = new PacketConverter(includeUserdata,
-				includeKey);
+		PacketConverter packetConverter = new PacketConverter(includeUserdata);
 
 		PacketGroup entity = new PacketGroup();
 		keyFromJson(jsonObject, entity);
@@ -29,7 +27,6 @@ public class PacketGroupConverter extends AbstractConverter<PacketGroup> {
 			Packet packet = packetConverter
 					.fromJson(jsonArray.getJSONObject(i));
 			packet.setGroupKey(entity.getKey());
-			entity.getPackets().add(packet);
 		}
 
 		return entity;
@@ -37,8 +34,7 @@ public class PacketGroupConverter extends AbstractConverter<PacketGroup> {
 
 	@Override
 	public JSONObject toJson(PacketGroup entity) throws JSONException {
-		PacketConverter packetConverter = new PacketConverter(includeUserdata,
-				includeKey);
+		PacketConverter packetConverter = new PacketConverter(includeUserdata);
 
 		JSONObject jsonObject = new JSONObject();
 		keyToJson(jsonObject, entity);
@@ -56,17 +52,10 @@ public class PacketGroupConverter extends AbstractConverter<PacketGroup> {
 
 	protected void keyFromJson(JSONObject jsonObject, PacketGroup entity)
 			throws JSONException {
-		switch (includeKey) {
-		case INCLUDE_ALL:
-			if (jsonObject.has("key")) {
-				entity.setKey(KeyFactory.createKey(
-						PacketGroup.class.getSimpleName(),
-						jsonObject.getLong("key")));
-			}
-			break;
-		default:
-		case INCLUDE_NONE:
-			break;
+		if (jsonObject.has("key")) {
+			entity.setKey(KeyFactory.createKey(
+					PacketGroup.class.getSimpleName(),
+					jsonObject.getLong("key")));
 		}
 	}
 }

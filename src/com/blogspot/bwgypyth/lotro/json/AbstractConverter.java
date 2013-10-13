@@ -43,12 +43,9 @@ import com.google.appengine.labs.repackaged.org.json.JSONObject;
 public abstract class AbstractConverter<T extends OwnedEntity> {
 
 	protected final IncludeUserdata includeUserdata;
-	protected final IncludeKey includeKey;
 
-	public AbstractConverter(IncludeUserdata includeUserdata,
-			IncludeKey includeKey) {
+	public AbstractConverter(IncludeUserdata includeUserdata) {
 		this.includeUserdata = includeUserdata;
-		this.includeKey = includeKey;
 	}
 
 	/**
@@ -176,27 +173,20 @@ public abstract class AbstractConverter<T extends OwnedEntity> {
 		}
 	}
 
-	protected final void keyToJson(JSONObject jsonObject, OwnedEntity entity)
-			throws JSONException {
-		switch (includeKey) {
-		case INCLUDE_ALL:
-			if (entity.getKey() != null) {
-				jsonObject.put("key", entity.getKey().getId());
-				if (entity.getKey().getParent() != null) {
-					jsonObject.put("parent_key", entity.getKey().getParent()
-							.getId());
-					if (entity.getKey().getParent().getParent() != null) {
-						jsonObject.put("parent_parent_key", entity.getKey()
-								.getParent().getParent().getId());
-					}
+	protected static final void keyToJson(JSONObject jsonObject,
+			OwnedEntity entity) throws JSONException {
+		if (entity.getKey() != null) {
+			jsonObject.put("key", entity.getKey().getId());
+			if (entity.getKey().getParent() != null) {
+				jsonObject.put("parent_key", entity.getKey().getParent()
+						.getId());
+				if (entity.getKey().getParent().getParent() != null) {
+					jsonObject.put("parent_parent_key", entity.getKey()
+							.getParent().getParent().getId());
 				}
-			} else {
-				jsonObject.put("key", "");
 			}
-			break;
-		default:
-		case INCLUDE_NONE:
-			break;
+		} else {
+			jsonObject.put("key", "");
 		}
 	}
 }
