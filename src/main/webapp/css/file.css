@@ -1,0 +1,16 @@
+body {
+	font-family: sans-serif;
+}
+
+.ui-autocomplete-loading {
+	background: white url('../i_ajax_loader.gif') right center no-repeat;
+}
+
+.ui-widget {
+	font-size: 0.8em
+}
+
+#toolbar {
+	padding: 4px;
+	display: inline-block;
+}

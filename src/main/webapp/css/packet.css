@@ -1,0 +1,23 @@
+div#packet_offset, div#packet_hex, div#packet_decoded {
+	font-family: monospace;
+	float: left;
+	line-height: 150%;
+	white-space: nowrap;
+}
+
+div#legend {
+	clear: both;
+	margin-top: 5px;
+}
+
+div#packet_decoded, div#packet_hex {
+	margin-left: 8px;
+}
+
+#legend div.hoverable {
+	margin: 0 2px;
+}
+
+span.display_header {
+	color: #5c5c5c;
+}

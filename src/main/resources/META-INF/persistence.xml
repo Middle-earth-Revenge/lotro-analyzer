@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
+	version="2.1">
+
+	<persistence-unit name="transactions-optional"
+		transaction-type="RESOURCE_LOCAL">
+		<non-jta-data-source>java:/comp/env/jdbc/lotroDS</non-jta-data-source>
+		<class>com.blogspot.bwgypyth.lotro.model.Analysis</class>
+		<class>com.blogspot.bwgypyth.lotro.model.AnalysisEntry</class>
+		<class>com.blogspot.bwgypyth.lotro.model.Entity</class>
+		<class>com.blogspot.bwgypyth.lotro.model.OwnedEntity</class>
+		<class>com.blogspot.bwgypyth.lotro.model.Packet</class>
+		<class>com.blogspot.bwgypyth.lotro.model.PacketGroup</class>
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<properties>
+			<property name="hibernate.hbm2ddl.auto" value="update" />
+			<property name = "hibernate.show_sql" value = "true" />
+		</properties>
+	</persistence-unit>
+</persistence>

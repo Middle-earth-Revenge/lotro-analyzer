@@ -1,0 +1,28 @@
+span.decoded_or_hex_element_selected {
+	border: 1px dashed #333333;
+	margin: -1px;
+}
+
+span.decoded_or_hex_element {
+	cursor: pointer;
+}
+
+[contenteditable] {
+	outline: 1px dotted #CCCCCC;
+}
+
+div#analysis_entry_dialog td.description, div#create_group_dialog td.description {
+	font-size: 0.7em;
+	vertical-align: top;
+	padding-top: 0.5em;
+}
+
+div#analysis_entry_dialog th, div#create_group_dialog th {
+	text-align: left;
+	vertical-align: top;
+}
+
+/* Workaround: autocomplete is behind the dialog */
+ul.ui-autocomplete {
+	z-index: 101;
+}
